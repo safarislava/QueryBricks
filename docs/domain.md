@@ -7,6 +7,8 @@ classDiagram
     class DbTable 
     DbTable ..|> Table
     
+    class JoinRule
+    
     class Joining {
         -leftTable Table
         -rightTable Table
@@ -14,15 +16,28 @@ classDiagram
     }
     Joining ..|> Table
     
-    class Constraint {
+    
+    class RowMatching {
         <<interface>>
     }
-    Constraint ..|> Table
+    %% возможно где-то Table стоит заменить на синоним типа Data, Selected и т.д.
+    RowMatching ..|> Table 
     
-    class WhereConstraint { 
-        
+    class WhereMatching {
+        condition Condition
     }
-    WhereConstraint ..|> Constraint
+    %% надо сделать так, чтобы WHERE нельзя было писать после Transformation
+    %% при том Transformation должна принимать и просто таблицу, и "прореженную"
+    WhereMatching ..|> RowMatching
+    
+    class Condition {
+        <<interface>>
+    }
+    
+    class Equals
+    Equals ..|> Condition
+    class And
+    And ..|> Condition
     
     class Transformation { 
         <<interface>>
@@ -32,14 +47,55 @@ classDiagram
     class Grouping 
     Grouping ..|> Transformation
     
+    class Limiting
+    Limiting ..|> Transformation
+    
+    class Offset
+    Offset ..|> Transformation
+    
+    class Distinct
+    Distinct ..|> Transformation
+    
+    %% спроектировать HAVING
+    
     class ColumnMapping 
     
+    class Column {
+        <<interface>>
+    }
+    
+    class DbColumn 
+    DbColumn ..|> Column
+
+    class AggregatedColumn
+    AggregatedColumn ..|> Column
+    
     class Columns {
+        <<interface>>
+    }
+    
+    class AllColumns
+    AllColumn ..|> Columns
+    
+    class ColumnsSelection {
         -columns List<Column>
     }
+    ColumnsSelection ..|> Columns
 
-    class Selection {
-        -table Table
-        -columns Columns
+    class Subquery {
+        -query Query
     }
+    Subquery ..|> Table
+
+    class Query {
+        <<interface>>
+    }
+
+    class DbQuery {
+        -columns Columns
+        -table Table
+    }
+    DbQuery ..|> Query
+    
+    %% алиасы для таблиц и столбцов
 ```
