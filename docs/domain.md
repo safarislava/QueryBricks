@@ -1,14 +1,45 @@
 ```mermaid
 classDiagram
-    class Order {
-        +UUID id
-        +OrderStatus status
-        +place()
-        +cancel()
+    class Table {
+        <<interface>>
     }
-    class Customer {
-        +String name
-        +String email
+    
+    class DbTable 
+    DbTable ..|> Table
+    
+    class Joining {
+        -leftTable Table
+        -rightTable Table
+        -rule JoinRule
     }
-    Customer --> Order
+    Joining ..|> Table
+    
+    class Constraint {
+        <<interface>>
+    }
+    Constraint ..|> Table
+    
+    class WhereConstraint { 
+        
+    }
+    WhereConstraint ..|> Constraint
+    
+    class Transformation { 
+        <<interface>>
+    }
+    Transformation ..|> Table
+    
+    class Grouping 
+    Grouping ..|> Transformation
+    
+    class ColumnMapping 
+    
+    class Columns {
+        -columns List<Column>
+    }
+
+    class Selection {
+        -table Table
+        -columns Columns
+    }
 ```
