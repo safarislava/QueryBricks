@@ -1,101 +1,97 @@
 ```mermaid
 classDiagram
+    class Mapping~C~ {
+        <<interface>>
+        + columns() C
+    }
+
     class Table {
         <<interface>>
     }
-    
-    class DbTable 
+    Table ..|> Mapping
+
+    class DbTable
     DbTable ..|> Table
-    
+
     class JoinRule
-    
-    class Joining {
-        -leftTable Table
-        -rightTable Table
+
+    class JoiningMapping~LC RC~ {
+        -left Mapping~LC~
+        -right Mapping~RC~
         -rule JoinRule
     }
-    Joining ..|> Table
-    
-    
-    class RowMatching {
-        <<interface>>
-    }
-    %% возможно где-то Table стоит заменить на синоним типа Data, Selected и т.д.
-    RowMatching ..|> Table 
-    
-    class WhereMatching {
-        condition Condition
-    }
-    %% надо сделать так, чтобы WHERE нельзя было писать после Transformation
-    %% при том Transformation должна принимать и просто таблицу, и "прореженную"
-    WhereMatching ..|> RowMatching
-    
+    JoiningMapping --> JoinRule
+    JoiningMapping ..|> Mapping
+
     class Condition {
         <<interface>>
     }
-    
+
     class Equals
     Equals ..|> Condition
     class And
     And ..|> Condition
-    
-    class Transformation { 
-        <<interface>>
+
+    class WhereMatching~C~ {
+        -origin Mapping~C~
+        -condition Condition
     }
-    Transformation ..|> Table
-    
-    class Grouping 
-    Grouping ..|> Transformation
-    
-    class Limiting
-    Limiting ..|> Transformation
-    
-    class Offset
-    Offset ..|> Transformation
-    
-    class Distinct
-    Distinct ..|> Transformation
-    
+    %% надо сделать так, чтобы WHERE нельзя было писать после Transformation
+    WhereMatching ..|> Mapping
+    WhereMatching --> Condition
+
+    class Grouping~C~
+    Grouping ..|> Mapping
+
+    class Limiting~C~
+    Limiting ..|> Mapping
+
+    class Offset~C~
+    Offset ..|> Mapping
+
+    class Distinct~C~
+    Distinct ..|> Mapping
+
     %% спроектировать HAVING
-    
-    class ColumnMapping 
-    
+
     class Column {
         <<interface>>
     }
-    
-    class DbColumn 
+
+    class DbColumn
     DbColumn ..|> Column
 
     class AggregatedColumn
     AggregatedColumn ..|> Column
-    
+
     class Columns {
         <<interface>>
     }
-    
+
     class AllColumns
-    AllColumn ..|> Columns
-    
+    AllColumns ..|> Columns
+
     class ColumnsSelection {
-        -columns List<Column>
+        -columns List~Column~
     }
     ColumnsSelection ..|> Columns
+    ColumnsSelection --> Column
 
-    class Subquery {
-        -query Query
+    class Subquery~C~ {
+        -query Query~C~
     }
-    Subquery ..|> Table
+    Subquery ..|> Mapping
 
-    class Query {
+    class Query~C~ {
         <<interface>>
     }
 
-    class DbQuery {
+    class DbQuery~C~ {
         -columns Columns
-        -table Table
+        -mapping Mapping~C~
     }
     DbQuery ..|> Query
-    
+    DbQuery --> Columns
+
     %% алиасы для таблиц и столбцов
 ```
