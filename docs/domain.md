@@ -1,5 +1,6 @@
 ```mermaid
 classDiagram
+    %% надо разобраться с Scheme и Table. Кто от кого зависит, и нужен ли вообще Scheme
     class Scheme~C~ {
         <<interface>>
         + columns() C
@@ -13,6 +14,19 @@ classDiagram
     class DbTable
     DbTable ..|> Table
 
+    class DbScheme~C~ {
+        -table DbTable
+    }
+    DbScheme ..|> Scheme
+    DbScheme --> DbTable
+```
+
+```mermaid
+classDiagram
+    class Scheme~C~ {
+        <<interface>>
+    }
+
     class JoinRule {
         <<interface>>
     }
@@ -22,13 +36,20 @@ classDiagram
     class LeftJoin
     LeftJoin ..|> JoinRule
 
-    class JoiningScheme~LC RC~ {
+    class JoiningScheme~LC, RC~ {
         -left Scheme~LC~
         -right Scheme~RC~
         -rule JoinRule
     }
-    JoiningScheme --> JoinRule
     JoiningScheme ..|> Scheme
+    JoiningScheme --> JoinRule
+```
+
+```mermaid
+classDiagram
+    class Scheme~C~ {
+        <<interface>>
+    }
 
     class Condition {
         <<interface>>
@@ -46,6 +67,13 @@ classDiagram
     %% надо сделать так, чтобы WHERE нельзя было писать после GROUP BY
     WhereFilter ..|> Scheme
     WhereFilter --> Condition
+```
+
+```mermaid
+classDiagram
+    class Scheme~C~ {
+        <<interface>>
+    }
 
     class Grouping~C~
     Grouping ..|> Scheme
@@ -60,7 +88,10 @@ classDiagram
     Distinct ..|> Scheme
 
     %% спроектировать HAVING
+```
 
+```mermaid
+classDiagram
     class Column {
         <<interface>>
     }
@@ -83,11 +114,17 @@ classDiagram
     }
     ColumnsSelection ..|> Columns
     ColumnsSelection --> Column
+```
 
-    class Subquery~C~ {
-        -query Query~C~
+```mermaid
+classDiagram
+    class Scheme~C~ {
+        <<interface>>
     }
-    Subquery ..|> Scheme
+
+    class Columns {
+        <<interface>>
+    }
 
     class Query~C~ {
         <<interface>>
@@ -95,10 +132,15 @@ classDiagram
 
     class DbQuery~C~ {
         -columns Columns
-        -mapping Scheme~C~
+        -scheme Scheme~C~
     }
     DbQuery ..|> Query
     DbQuery --> Columns
+
+    class Subquery~C~ {
+        -query Query~C~
+    }
+    Subquery ..|> Scheme
 
     %% алиасы для таблиц и столбцов
 ```
