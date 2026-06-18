@@ -1,29 +1,20 @@
 ```mermaid
 classDiagram
-    %% надо разобраться с Scheme и Table. Кто от кого зависит, и нужен ли вообще Scheme
-    class Scheme~C~ {
+    class Table~C~ {
         <<interface>>
-        + columns() C
+        + schema() C
     }
 
-    class Table {
-        <<interface>>
+    class DbTable~C~ {
+        -name String
+        -schema C
     }
-    Table ..|> Scheme
-
-    class DbTable
     DbTable ..|> Table
-
-    class DbScheme~C~ {
-        -table DbTable
-    }
-    DbScheme ..|> Scheme
-    DbScheme --> DbTable
 ```
 
 ```mermaid
 classDiagram
-    class Scheme~C~ {
+    class Table~C~ {
         <<interface>>
     }
 
@@ -36,18 +27,24 @@ classDiagram
     class LeftJoin
     LeftJoin ..|> JoinRule
 
-    class JoiningScheme~LC, RC~ {
-        -left Scheme~LC~
-        -right Scheme~RC~
+    class JoinedSchema~LC, RC~ {
+        + left() LC
+        + right() RC
+    }
+
+    class JoinedTable~LC, RC~ {
+        -left Table~LC~
+        -right Table~RC~
         -rule JoinRule
     }
-    JoiningScheme ..|> Scheme
-    JoiningScheme --> JoinRule
+    JoinedTable ..|> Table
+    JoinedTable --> JoinRule
+    JoinedTable --> JoinedSchema
 ```
 
 ```mermaid
 classDiagram
-    class Scheme~C~ {
+    class Table~C~ {
         <<interface>>
     }
 
@@ -60,32 +57,32 @@ classDiagram
     class And
     And ..|> Condition
 
-    class WhereFilter~C~ {
-        -origin Scheme~C~
+    class ConditionFilteredTable~C~ {
+        -origin Table~C~
         -condition Condition
     }
     %% надо сделать так, чтобы WHERE нельзя было писать после GROUP BY
-    WhereFilter ..|> Scheme
-    WhereFilter --> Condition
+    ConditionFilteredTable ..|> Table
+    ConditionFilteredTable --> Condition
 ```
 
 ```mermaid
 classDiagram
-    class Scheme~C~ {
+    class Table~C~ {
         <<interface>>
     }
 
-    class Grouping~C~
-    Grouping ..|> Scheme
+    class GroupedTable~C~
+    GroupedTable ..|> Table
 
-    class Limiting~C~
-    Limiting ..|> Scheme
+    class LimitedTable~C~
+    LimitedTable ..|> Table
 
-    class Offset~C~
-    Offset ..|> Scheme
+    class OffsetTable~C~
+    OffsetTable ..|> Table
 
-    class Distinct~C~
-    Distinct ..|> Scheme
+    class DistinctTable~C~
+    DistinctTable ..|> Table
 
     %% спроектировать HAVING
 ```
@@ -118,7 +115,7 @@ classDiagram
 
 ```mermaid
 classDiagram
-    class Scheme~C~ {
+    class Table~C~ {
         <<interface>>
     }
 
@@ -130,58 +127,61 @@ classDiagram
         <<interface>>
     }
 
-    class DbQuery~C~ {
+    class SelectionDbQuery~C~ {
         -columns Columns
-        -scheme Scheme~C~
+        -table Table~C~
     }
-    DbQuery ..|> Query
-    DbQuery --> Columns
+    SelectionDbQuery ..|> Query
+    SelectionDbQuery --> Columns
+    SelectionDbQuery --> Table
 
-    class Subquery~C~ {
+    class SubqueryTable~C~ {
         -query Query~C~
     }
-    Subquery ..|> Scheme
+    SubqueryTable ..|> Table
 
     %% алиасы для таблиц и столбцов
 ```
 
 # Пример запроса кода
 ## Схема данных
+
+<!-- Это компросисс на который прошлось пойти ради статической типизации. -->
 ```java
-class UsersColumns {
-    final Column id       = new DbColumn("id");
+class UsersSchema {
+    final Column id = new DbColumn("id");
     final Column username = new DbColumn("username");
-    final Column status   = new DbColumn("status");
+    final Column status = new DbColumn("status");
 }
 
-class OrdersColumns {
+class OrdersSchema {
     final Column userId = new DbColumn("user_id");
     final Column amount = new DbColumn("amount");
 }
 ```
 
 ```java
-Scheme<UsersColumns>  users  = new DbScheme<>(new DbTable("users"),  new UsersColumns());
-Scheme<OrdersColumns> orders = new DbScheme<>(new DbTable("orders"), new OrdersColumns());
+Table<UsersSchema>  users  = new DbTable<>("users",  new UsersSchema());
+Table<OrdersSchema> orders = new DbTable<>("orders", new OrdersSchema());
 
-JoiningScheme<UsersColumns, OrdersColumns> joined = new JoiningScheme<>(
+Table<JoinedScema<UsersSchema, OrdersSchema>> joined = new JoinedTable<>(
     users,
     orders,
-    new InnerJoin(users.columns().id, orders.columns().userId)
+    new InnerJoin(users.schema().id, orders.schema().userId)
 );
 
-Scheme<JoinedColumns<UsersColumns, OrdersColumns>> filtered = new WhereFilter<>(
+Table<JoinedScema<UsersSchema, OrdersSchema>> filtered = new ConditionFiltedTable<>(
     joined,
-    new Equals(joined.columns().left().status, new Literal("active"))
+    new Equals(joined.schema().left().status, new Literal("active"))
 );
 
-Scheme<JoinedColumns<UsersColumns, OrdersColumns>> limited = new Limiting<>(filtered, 10);
+Table<JoinedScema<UsersSchema, OrdersSchema>> limited = new LimitedTable<>(filtered, 10);
 
-Query<?> query = new DbQuery<>(
+Query<?> query = new SelectionDbQuery<>(
     new ColumnsSelection(
-        joined.columns().left().id,
-        joined.columns().left().username,
-        joined.columns().right().amount
+        joined.schema().left().id,
+        joined.schema().left().username,
+        joined.schema().right().amount
     ),
     limited
 );
