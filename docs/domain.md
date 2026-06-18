@@ -342,7 +342,7 @@ Query<?> query = new SelectDbQuery<>(
     new ColumnsSelection(
         joined.schema().left().id,
         joined.schema().left().username,
-        new AliasedColumn(joined.schema().right().amount, "total")
+        joined.schema().right().amount
     ),
     limited
 );
@@ -355,6 +355,43 @@ FROM users
 JOIN orders ON users.id = orders.user_id
 WHERE users.status = 'active'
 LIMIT 10
+```
+
+## Aggregate query
+
+```java
+Table<UsersSchema>  users  = new DbTable<>("users",  new UsersSchema());
+Table<OrdersSchema> orders = new DbTable<>("orders", new OrdersSchema());
+
+Table<JoinedScema<UsersSchema, OrdersSchema>> joined = new JoinedTable<>(
+        users,
+        orders,
+        new InnerJoin(users.schema().id, orders.schema().userId)
+);
+
+Table<JoinedSchema<UsersSchema, OrdersSchema>> grouped = new GroupedTable<>(
+    joined,
+    joined.schema().left().status
+);
+
+Query<?> query = new SelectDbQuery<>(
+    new ColumnsSelection(
+        joined.schema().left().status,
+        new AliasedColumn(
+                new AggregatedColumn("SUM", joined.schema().right().amount), 
+                "total_amount"
+        )
+    ),
+    grouped
+);
+```
+
+### Итоговый SQL
+```sql
+SELECT users.status, SUM(orders.amount) AS total_amount
+FROM users
+JOIN orders ON users.id = orders.user_id
+GROUP BY users.status
 ```
 
 ## Insert query
