@@ -103,6 +103,13 @@ classDiagram
     class AggregatedColumn
     AggregatedColumn ..|> Column
 
+    class AliasedColumn {
+        -origin Column
+        -alias String
+    }
+    AliasedColumn ..|> Column
+    AliasedColumn --> Column
+
     class Columns {
         <<interface>>
     }
@@ -144,7 +151,7 @@ classDiagram
     }
     SubqueryTable ..|> Table
 
-    %% алиасы для таблиц и столбцов
+    %% алиасы для таблиц
 ```
 
 # Пример запроса кода
@@ -185,7 +192,7 @@ Query<?> query = new SelectionDbQuery<>(
     new ColumnsSelection(
         joined.schema().left().id,
         joined.schema().left().username,
-        joined.schema().right().amount
+        new AliasedColumn(joined.schema().right().amount, "total")
     ),
     limited
 );
@@ -193,7 +200,7 @@ Query<?> query = new SelectionDbQuery<>(
 
 ## Итоговый SQL
 ```sql
-SELECT users.id, users.username, orders.amount
+SELECT users.id, users.username, orders.amount AS total
 FROM users
 JOIN orders ON users.id = orders.user_id
 WHERE users.status = 'active'
