@@ -182,6 +182,13 @@ classDiagram
 
     class NullLiteral
     NullLiteral ..|> Literal
+
+    class FunctionCall {
+        -name String
+        -args List~Value~
+    }
+    FunctionCall ..|> Value
+    FunctionCall --> Value
 ```
 
 ```mermaid
@@ -198,12 +205,9 @@ classDiagram
         <<interface>>
     }
 
-    class FunctionCall {
-        -name String
-        -args List~Value~
+    class Column {
+        <<interface>>
     }
-    FunctionCall ..|> Value
-    FunctionCall --> Value
 
     class ColumnValue {
         -column Column
@@ -232,12 +236,16 @@ classDiagram
     class Table~C~ {
         <<interface>>
     }
-    
+
     class Query~C~ {
         <<interface>>
     }
-    
+
     class Condition {
+        <<interface>>
+    }
+
+    class ColumnAssignment {
         <<interface>>
     }
 
@@ -245,15 +253,22 @@ classDiagram
         -column Column
         -value Value
     }
+    ColumnValue ..|> ColumnAssignment
+
+    class ColumnExpression {
+        -column Column
+        -expression Expression
+    }
+    ColumnExpression ..|> ColumnAssignment
 
     class UpdateDbQuery~C~ {
         -table Table~C~
-        -values List~ColumnValue~
+        -assignments List~ColumnAssignment~
         -condition Condition
     }
     UpdateDbQuery ..|> Query
     UpdateDbQuery --> Table
-    UpdateDbQuery --> ColumnValue
+    UpdateDbQuery --> ColumnAssignment
     UpdateDbQuery --> Condition
 ```
 
