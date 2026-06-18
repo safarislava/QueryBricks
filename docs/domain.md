@@ -138,13 +138,13 @@ classDiagram
         <<interface>>
     }
 
-    class SelectionDbQuery~C~ {
+    class SelectDbQuery~C~ {
         -columns Columns
         -table Table~C~
     }
-    SelectionDbQuery ..|> Query
-    SelectionDbQuery --> Columns
-    SelectionDbQuery --> Table
+    SelectDbQuery ..|> Query
+    SelectDbQuery --> Columns
+    SelectDbQuery --> Table
 
     class SubqueryTable~C~ {
         -query Query~C~
@@ -154,15 +154,59 @@ classDiagram
     %% алиасы для таблиц
 ```
 
+```mermaid
+classDiagram
+    class Query~C~ {
+        <<interface>>
+    }
+
+    class Value {
+        <<interface>>
+    }
+
+    class Literal {
+        -value Object
+    }
+    Literal ..|> Value
+
+    class FunctionCall {
+        -name String
+        -args List~Value~
+    }
+    FunctionCall ..|> Value
+    FunctionCall --> Value
+
+    class ColumnValue {
+        -column Column
+        -value Value
+    }
+    ColumnValue --> Column
+    ColumnValue --> Value
+
+    class InsertRow {
+        -values List~ColumnValue~
+    }
+    InsertRow --> ColumnValue
+
+    class InsertDbQuery~C~ {
+        -table Table~C~
+        -rows List~InsertRow~
+    }
+    InsertDbQuery ..|> Query
+    InsertDbQuery --> DbTable
+    InsertDbQuery --> InsertRow
+```
+
 # Пример запроса кода
 ## Схема данных
 
 <!-- Это компросисс на который прошлось пойти ради статической типизации. -->
 ```java
 class UsersSchema {
-    final Column id = new DbColumn("id");
-    final Column username = new DbColumn("username");
-    final Column status = new DbColumn("status");
+    final Column id        = new DbColumn("id");
+    final Column username  = new DbColumn("username");
+    final Column status    = new DbColumn("status");
+    final Column createdAt = new DbColumn("created_at");
 }
 
 class OrdersSchema {
@@ -188,7 +232,7 @@ Table<JoinedScema<UsersSchema, OrdersSchema>> filtered = new ConditionFiltedTabl
 
 Table<JoinedScema<UsersSchema, OrdersSchema>> limited = new LimitedTable<>(filtered, 10);
 
-Query<?> query = new SelectionDbQuery<>(
+Query<?> query = new SelectDbQuery<>(
     new ColumnsSelection(
         joined.schema().left().id,
         joined.schema().left().username,
@@ -205,4 +249,24 @@ FROM users
 JOIN orders ON users.id = orders.user_id
 WHERE users.status = 'active'
 LIMIT 10
+```
+
+```java
+DbTable<UsersSchema> users = new DbTable<>("users", new UsersSchema());
+
+Query<?> insert = new InsertDbQuery<>(
+    users,
+    List.of(
+        new InsertRow(
+            new ColumnValue(users.schema().id,        new Literal(1)),
+            new ColumnValue(users.schema().username,  new Literal("john")),
+            new ColumnValue(users.schema().status,    new Literal("active")),
+            new ColumnValue(users.schema().createdAt, new FunctionCall("NOW"))
+        )
+    )
+);
+```
+
+```sql
+INSERT INTO users (id, username, status, created_at) VALUES (1, 'john', 'active', NOW())
 ```
