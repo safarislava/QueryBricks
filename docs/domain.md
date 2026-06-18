@@ -138,13 +138,13 @@ classDiagram
         <<interface>>
     }
 
-    class SelectionDbQuery~C~ {
+    class SelectDbQuery~C~ {
         -columns Columns
         -table Table~C~
     }
-    SelectionDbQuery ..|> Query
-    SelectionDbQuery --> Columns
-    SelectionDbQuery --> Table
+    SelectDbQuery ..|> Query
+    SelectDbQuery --> Columns
+    SelectDbQuery --> Table
 
     class SubqueryTable~C~ {
         -query Query~C~
@@ -154,15 +154,164 @@ classDiagram
     %% алиасы для таблиц
 ```
 
+```mermaid
+classDiagram
+    class Value {
+        <<interface>>
+    }
+    
+    class Literal {
+        <<interface>>
+    }
+    Literal ..|> Value
+
+    class StringLiteral {
+        -value String
+    }
+    StringLiteral ..|> Literal
+
+    class NumberLiteral {
+        -value Number
+    }
+    NumberLiteral ..|> Literal
+
+    class BooleanLiteral {
+        -value boolean
+    }
+    BooleanLiteral ..|> Literal
+
+    class NullLiteral
+    NullLiteral ..|> Literal
+
+    class FunctionCall {
+        -name String
+        -args List~Value~
+    }
+    FunctionCall ..|> Value
+    FunctionCall --> Value
+```
+
+```mermaid
+classDiagram
+    class Table~C~ {
+        <<interface>>
+    }
+    
+    class Query~C~ {
+        <<interface>>
+    }
+
+    class Value {
+        <<interface>>
+    }
+
+    class Column {
+        <<interface>>
+    }
+
+    class ColumnValue {
+        -column Column
+        -value Value
+    }
+    ColumnValue --> Column
+    ColumnValue --> Value
+
+    class InsertRow {
+        -values List~ColumnValue~
+    }
+    InsertRow --> ColumnValue
+
+    class InsertDbQuery~C~ {
+        -table Table~C~
+        -rows List~InsertRow~
+    }
+    InsertDbQuery ..|> Query
+    InsertDbQuery --> Table
+    InsertDbQuery --> InsertRow
+
+```
+
+```mermaid
+classDiagram
+    class ColumnAssignment {
+        <<interface>>
+    }
+    
+    class ColumnValue {
+        -column Column
+        -value Value
+    }
+    ColumnValue ..|> ColumnAssignment
+    
+    class ColumnExpression {
+        -column Column
+        -expression Expression
+    }
+    ColumnExpression ..|> ColumnAssignment
+```
+
+```mermaid
+classDiagram
+    class Table~C~ {
+        <<interface>>
+    }
+
+    class Query~C~ {
+        <<interface>>
+    }
+
+    class Condition {
+        <<interface>>
+    }
+
+    class ColumnAssignment {
+        <<interface>>
+    }
+
+    class UpdateDbQuery~C~ {
+        -table Table~C~
+        -assignments List~ColumnAssignment~
+        -condition Condition
+    }
+    UpdateDbQuery ..|> Query
+    UpdateDbQuery --> Table
+    UpdateDbQuery --> ColumnAssignment
+    UpdateDbQuery --> Condition
+```
+    
+```mermaid
+classDiagram
+    class Table~C~ {
+        <<interface>>
+    }
+
+    class Query~C~ {
+        <<interface>>
+    }
+
+    class Condition {
+        <<interface>>
+    }
+
+    class DeleteDbQuery~C~ {
+        -table Table~C~
+        -condition Condition
+    }
+    DeleteDbQuery ..|> Query
+    DeleteDbQuery --> Table
+    DeleteDbQuery --> Condition
+```
+
 # Пример запроса кода
 ## Схема данных
 
 <!-- Это компросисс на который прошлось пойти ради статической типизации. -->
 ```java
 class UsersSchema {
-    final Column id = new DbColumn("id");
-    final Column username = new DbColumn("username");
-    final Column status = new DbColumn("status");
+    final Column id        = new DbColumn("id");
+    final Column username  = new DbColumn("username");
+    final Column status    = new DbColumn("status");
+    final Column createdAt = new DbColumn("created_at");
 }
 
 class OrdersSchema {
@@ -171,6 +320,7 @@ class OrdersSchema {
 }
 ```
 
+## Select query
 ```java
 Table<UsersSchema>  users  = new DbTable<>("users",  new UsersSchema());
 Table<OrdersSchema> orders = new DbTable<>("orders", new OrdersSchema());
@@ -183,26 +333,121 @@ Table<JoinedScema<UsersSchema, OrdersSchema>> joined = new JoinedTable<>(
 
 Table<JoinedScema<UsersSchema, OrdersSchema>> filtered = new ConditionFiltedTable<>(
     joined,
-    new Equals(joined.schema().left().status, new Literal("active"))
+    new Equals(joined.schema().left().status, new StringLiteral("active"))
 );
 
 Table<JoinedScema<UsersSchema, OrdersSchema>> limited = new LimitedTable<>(filtered, 10);
 
-Query<?> query = new SelectionDbQuery<>(
+Query<?> query = new SelectDbQuery<>(
     new ColumnsSelection(
         joined.schema().left().id,
         joined.schema().left().username,
-        new AliasedColumn(joined.schema().right().amount, "total")
+        joined.schema().right().amount
     ),
     limited
 );
 ```
 
-## Итоговый SQL
+### Итоговый SQL
 ```sql
 SELECT users.id, users.username, orders.amount AS total
 FROM users
 JOIN orders ON users.id = orders.user_id
 WHERE users.status = 'active'
 LIMIT 10
+```
+
+## Aggregate query
+
+```java
+Table<UsersSchema>  users  = new DbTable<>("users",  new UsersSchema());
+Table<OrdersSchema> orders = new DbTable<>("orders", new OrdersSchema());
+
+Table<JoinedScema<UsersSchema, OrdersSchema>> joined = new JoinedTable<>(
+        users,
+        orders,
+        new InnerJoin(users.schema().id, orders.schema().userId)
+);
+
+Table<JoinedSchema<UsersSchema, OrdersSchema>> grouped = new GroupedTable<>(
+    joined,
+    joined.schema().left().status
+);
+
+Query<?> query = new SelectDbQuery<>(
+    new ColumnsSelection(
+        joined.schema().left().status,
+        new AliasedColumn(
+                new AggregatedColumn("SUM", joined.schema().right().amount), 
+                "total_amount"
+        )
+    ),
+    grouped
+);
+```
+
+### Итоговый SQL
+```sql
+SELECT users.status, SUM(orders.amount) AS total_amount
+FROM users
+JOIN orders ON users.id = orders.user_id
+GROUP BY users.status
+```
+
+## Insert query
+
+```java
+DbTable<UsersSchema> users = new DbTable<>("users", new UsersSchema());
+
+Query<?> insert = new InsertDbQuery<>(
+    users,
+    List.of(
+        new InsertRow(
+            new ColumnValue(users.schema().id,        new NumberLiteral(1)),
+            new ColumnValue(users.schema().username,  new StringLiteral("john")),
+            new ColumnValue(users.schema().status,    new StringLiteral("active")),
+            new ColumnValue(users.schema().createdAt, new FunctionCall("NOW"))
+        )
+    )
+);
+```
+
+### Итоговый SQL
+```sql
+INSERT INTO users (id, username, status, created_at) VALUES (1, 'john', 'active', NOW())
+```
+
+## Update query
+
+```java
+DbTable<UsersSchema> users = new DbTable<>("users", new UsersSchema());
+
+Query<?> update = new UpdateDbQuery<>(
+    users,
+    List.of(
+        new ColumnValue(users.schema().status, new StringLiteral("inactive"))
+    ),
+    new Equals(users.schema().id, new NumberLiteral(1))
+);
+```
+
+### Итоговый SQL
+```sql
+UPDATE users SET status = 'inactive' WHERE id = 1
+```
+
+## Delete query
+
+```java
+DbTable<UsersSchema> users = new DbTable<>("users", new UsersSchema());
+
+Query<?> delete = new DeleteDbQuery<>(
+    users,
+    new Equals(users.schema().id, new NumberLiteral(1))
+);
+```
+
+### Итоговый SQL
+```sql
+DELETE FROM users WHERE id = 1
 ```
