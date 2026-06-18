@@ -1,5 +1,6 @@
 ```mermaid
 classDiagram
+    %% cхему можно кодогенерировать
     class Table~C~ {
         <<interface>>
         + schema() C
@@ -9,7 +10,7 @@ classDiagram
         <<interface>>
     }
     FilterableTable ..|> Table
-
+    
     class DbTable~C~ {
         -name String
         -schema C
@@ -62,12 +63,17 @@ classDiagram
     class And
     And ..|> Condition
 
-    class ConditionFilteredTable~C~ {
+    class FilteredTable~C~ {
         -origin FilterableTable~C~
         -condition Condition
     }
-    ConditionFilteredTable ..|> FilterableTable
-    ConditionFilteredTable --> Condition
+    FilteredTable ..|> FilterableTable
+    FilteredTable --> Condition
+
+    class SubqueryTable~C~ {
+        -query Query~C~
+    }
+    SubqueryTable ..|> FilterableTable
 ```
 
 ```mermaid
@@ -76,8 +82,25 @@ classDiagram
         <<interface>>
     }
 
+    class Condition {
+        <<interface>>
+    }
+
+    class HavableTable~C~ {
+        <<interface>>
+    }
+    HavableTable ..|> Table
+
     class GroupedTable~C~
-    GroupedTable ..|> Table
+    GroupedTable ..|> HavableTable
+
+    class HavingGroupTable~C~ {
+        -origin HavableTable~C~
+        -condition Condition
+    }
+    HavingGroupTable --> HavableTable
+    HavingGroupTable ..|> Table
+    HavingGroupTable --> Condition
 
     class LimitedTable~C~
     LimitedTable ..|> Table
@@ -87,8 +110,6 @@ classDiagram
 
     class DistinctTable~C~
     DistinctTable ..|> Table
-
-    %% спроектировать HAVING
 ```
 
 ```mermaid
@@ -146,11 +167,6 @@ classDiagram
     SelectDbQuery --> Columns
     SelectDbQuery --> Table
 
-    class SubqueryTable~C~ {
-        -query Query~C~
-    }
-    SubqueryTable ..|> Table
-
     %% алиасы для таблиц
 ```
 
@@ -183,12 +199,27 @@ classDiagram
     class NullLiteral
     NullLiteral ..|> Literal
 
-    class FunctionCall {
-        -name String
-        -args List~Value~
+    class Function {
+        <<interface>>
     }
-    FunctionCall ..|> Value
-    FunctionCall --> Value
+    Function ..|> Value
+
+    class Now
+    Now ..|> Function
+
+    class Addition {
+        -left Value
+        -right Value
+    }
+    Addition ..|> Function
+    Addition --> Value
+
+    class Subtraction {
+        -left Value
+        -right Value
+    }
+    Subtraction ..|> Function
+    Subtraction --> Value
 ```
 
 ```mermaid
@@ -228,26 +259,6 @@ classDiagram
     InsertDbQuery ..|> Query
     InsertDbQuery --> Table
     InsertDbQuery --> InsertRow
-
-```
-
-```mermaid
-classDiagram
-    class ColumnAssignment {
-        <<interface>>
-    }
-    
-    class ColumnValue {
-        -column Column
-        -value Value
-    }
-    ColumnValue ..|> ColumnAssignment
-    
-    class ColumnExpression {
-        -column Column
-        -expression Expression
-    }
-    ColumnExpression ..|> ColumnAssignment
 ```
 
 ```mermaid
@@ -264,18 +275,19 @@ classDiagram
         <<interface>>
     }
 
-    class ColumnAssignment {
-        <<interface>>
+    class ColumnValue {
+        -column Column
+        -value Value
     }
 
     class UpdateDbQuery~C~ {
         -table Table~C~
-        -assignments List~ColumnAssignment~
+        -assignments List~ColumnValue~
         -condition Condition
     }
     UpdateDbQuery ..|> Query
     UpdateDbQuery --> Table
-    UpdateDbQuery --> ColumnAssignment
+    UpdateDbQuery --> ColumnValue
     UpdateDbQuery --> Condition
 ```
     
@@ -406,7 +418,7 @@ Query<?> insert = new InsertDbQuery<>(
             new ColumnValue(users.schema().id,        new NumberLiteral(1)),
             new ColumnValue(users.schema().username,  new StringLiteral("john")),
             new ColumnValue(users.schema().status,    new StringLiteral("active")),
-            new ColumnValue(users.schema().createdAt, new FunctionCall("NOW"))
+            new ColumnValue(users.schema().createdAt, new Now())
         )
     )
 );
