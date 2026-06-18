@@ -156,14 +156,10 @@ classDiagram
 
 ```mermaid
 classDiagram
-    class Query~C~ {
-        <<interface>>
-    }
-
     class Value {
         <<interface>>
     }
-
+    
     class Literal {
         <<interface>>
     }
@@ -186,6 +182,21 @@ classDiagram
 
     class NullLiteral
     NullLiteral ..|> Literal
+```
+
+```mermaid
+classDiagram
+    class Table~C~ {
+        <<interface>>
+    }
+    
+    class Query~C~ {
+        <<interface>>
+    }
+
+    class Value {
+        <<interface>>
+    }
 
     class FunctionCall {
         -name String
@@ -211,8 +222,39 @@ classDiagram
         -rows List~InsertRow~
     }
     InsertDbQuery ..|> Query
-    InsertDbQuery --> DbTable
+    InsertDbQuery --> Table
     InsertDbQuery --> InsertRow
+
+```
+
+```mermaid
+classDiagram
+    class Table~C~ {
+        <<interface>>
+    }
+    
+    class Query~C~ {
+        <<interface>>
+    }
+    
+    class Condition {
+        <<interface>>
+    }
+
+    class ColumnValue {
+        -column Column
+        -value Value
+    }
+
+    class UpdateDbQuery~C~ {
+        -table Table~C~
+        -values List~ColumnValue~
+        -condition Condition
+    }
+    UpdateDbQuery ..|> Query
+    UpdateDbQuery --> Table
+    UpdateDbQuery --> ColumnValue
+    UpdateDbQuery --> Condition
 ```
 
 # Пример запроса кода
@@ -233,6 +275,7 @@ class OrdersSchema {
 }
 ```
 
+## Select query
 ```java
 Table<UsersSchema>  users  = new DbTable<>("users",  new UsersSchema());
 Table<OrdersSchema> orders = new DbTable<>("orders", new OrdersSchema());
@@ -260,7 +303,7 @@ Query<?> query = new SelectDbQuery<>(
 );
 ```
 
-## Итоговый SQL
+### Итоговый SQL
 ```sql
 SELECT users.id, users.username, orders.amount AS total
 FROM users
@@ -268,6 +311,8 @@ JOIN orders ON users.id = orders.user_id
 WHERE users.status = 'active'
 LIMIT 10
 ```
+
+## Insert query
 
 ```java
 DbTable<UsersSchema> users = new DbTable<>("users", new UsersSchema());
@@ -285,6 +330,26 @@ Query<?> insert = new InsertDbQuery<>(
 );
 ```
 
+### Итоговый SQL
 ```sql
 INSERT INTO users (id, username, status, created_at) VALUES (1, 'john', 'active', NOW())
+```
+
+## Update query
+
+```java
+DbTable<UsersSchema> users = new DbTable<>("users", new UsersSchema());
+
+Query<?> update = new UpdateDbQuery<>(
+    users,
+    List.of(
+        new ColumnValue(users.schema().status, new StringLiteral("inactive"))
+    ),
+    new Equals(users.schema().id, new NumberLiteral(1))
+);
+```
+
+### Итоговый SQL
+```sql
+UPDATE users SET status = 'inactive' WHERE id = 1
 ```
