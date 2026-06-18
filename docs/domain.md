@@ -123,6 +123,7 @@ classDiagram
     }
     Column ..|> Value
 
+    %% колонка должна знать имя своей таблицы для однозначной идентификации при кодировании в SQL
     class DbColumn
     DbColumn ..|> Column
 
@@ -177,6 +178,9 @@ classDiagram
         <<interface>>
     }
 
+    %% подумать над механизмом кодирования в SQL
+    %% сейчас я думаю что нужен интерфейс QueryPart : content() String, которые будет реализовываться всем попало
+    %% ну или просто оверайдить toString()
     class Query~C~ {
         <<interface>>
     }
