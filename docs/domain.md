@@ -114,15 +114,37 @@ classDiagram
 
 ```mermaid
 classDiagram
+    class Value {
+        <<interface>>
+    }
+
     class Column {
         <<interface>>
     }
+    Column ..|> Value
 
     class DbColumn
     DbColumn ..|> Column
 
-    class AggregatedColumn
+    class AggregatedColumn {
+        <<interface>>
+    }
     AggregatedColumn ..|> Column
+
+    class Sum {
+        -column Column
+    }
+    Sum ..|> AggregatedColumn
+
+    class Count {
+        -column Column
+    }
+    Count ..|> AggregatedColumn
+
+    class Avg {
+        -column Column
+    }
+    Avg ..|> AggregatedColumn
 
     class AliasedColumn {
         -origin Column
@@ -207,18 +229,23 @@ classDiagram
     class Now
     Now ..|> Function
 
+    class BinaryOperator {
+        <<interface>>
+    }
+    BinaryOperator ..|> Value
+
     class Addition {
         -left Value
         -right Value
     }
-    Addition ..|> Function
+    Addition ..|> BinaryOperator
     Addition --> Value
 
     class Subtraction {
         -left Value
         -right Value
     }
-    Subtraction ..|> Function
+    Subtraction ..|> BinaryOperator
     Subtraction --> Value
 ```
 
@@ -390,7 +417,7 @@ Query<?> query = new SelectDbQuery<>(
     new ColumnsSelection(
         joined.schema().left().status,
         new AliasedColumn(
-                new AggregatedColumn("SUM", joined.schema().right().amount), 
+                new Sum(joined.schema().right().amount), 
                 "total_amount"
         )
     ),
