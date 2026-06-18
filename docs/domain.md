@@ -165,9 +165,27 @@ classDiagram
     }
 
     class Literal {
-        -value Object
+        <<interface>>
     }
     Literal ..|> Value
+
+    class StringLiteral {
+        -value String
+    }
+    StringLiteral ..|> Literal
+
+    class NumberLiteral {
+        -value Number
+    }
+    NumberLiteral ..|> Literal
+
+    class BooleanLiteral {
+        -value boolean
+    }
+    BooleanLiteral ..|> Literal
+
+    class NullLiteral
+    NullLiteral ..|> Literal
 
     class FunctionCall {
         -name String
@@ -227,7 +245,7 @@ Table<JoinedScema<UsersSchema, OrdersSchema>> joined = new JoinedTable<>(
 
 Table<JoinedScema<UsersSchema, OrdersSchema>> filtered = new ConditionFiltedTable<>(
     joined,
-    new Equals(joined.schema().left().status, new Literal("active"))
+    new Equals(joined.schema().left().status, new StringLiteral("active"))
 );
 
 Table<JoinedScema<UsersSchema, OrdersSchema>> limited = new LimitedTable<>(filtered, 10);
@@ -258,9 +276,9 @@ Query<?> insert = new InsertDbQuery<>(
     users,
     List.of(
         new InsertRow(
-            new ColumnValue(users.schema().id,        new Literal(1)),
-            new ColumnValue(users.schema().username,  new Literal("john")),
-            new ColumnValue(users.schema().status,    new Literal("active")),
+            new ColumnValue(users.schema().id,        new NumberLiteral(1)),
+            new ColumnValue(users.schema().username,  new StringLiteral("john")),
+            new ColumnValue(users.schema().status,    new StringLiteral("active")),
             new ColumnValue(users.schema().createdAt, new FunctionCall("NOW"))
         )
     )
