@@ -9,12 +9,17 @@ classDiagram
     }
     FilterableTable ..|> Table
 
+    class WrapedTable~T extends Table~ {
+        <<interface>>
+        + origin() T
+    }
+    WrapedTable ..|> Table
+
     class AliasedTable~T extends Table~ {
         -origin T
         -alias String
-        + origin() T
     }
-    AliasedTable ..|> Table
+    AliasedTable ..|> WrapedTable~T~
 ```
 
 ```mermaid
@@ -37,14 +42,19 @@ classDiagram
     }
     LeftJoin ..|> JoinRule
 
+    class BinaryTable~L, R~ {
+        <<interface>>
+        + left() L
+        + right() R
+    }
+
     class JoinedTable~L, R~ {
         -left L
         -right R
         -rule JoinRule
-        + left() L
-        + right() R
     }
     JoinedTable ..|> FilterableTable
+    JoinedTable ..|> BinaryTable~L, R~
     JoinedTable --> JoinRule
 ```
 
@@ -63,12 +73,17 @@ classDiagram
         <<interface>>
     }
 
+    class WrapedTable~T extends Table~ {
+        <<interface>>
+        + origin() T
+    }
+    WrapedTable ..|> Table
+
     class FilteredTable~T extends FilterableTable~ {
         -origin T
         -condition Condition
-        + origin() T
     }
-    FilteredTable ..|> Table
+    FilteredTable ..|> WrapedTable~T~
     FilteredTable --> Condition
 
     class SubqueryTable~T extends FilterableTable~ {
@@ -89,39 +104,41 @@ classDiagram
     }
     HavableTable ..|> Table
 
+    class WrapedTable~T extends Table~ {
+        <<interface>>
+        + origin() T
+    }
+    WrapedTable ..|> Table
+
     class GroupedTable~T extends Table~ {
         -origin T
         -by List~Column~
-        + origin() T
     }
     GroupedTable ..|> HavableTable
+    GroupedTable ..|> WrapedTable~T~
 
     class HavingTable~T extends HavableTable~ {
         -origin T
         -condition Condition
-        + origin() T
     }
-    HavingTable ..|> Table
+    HavingTable ..|> WrapedTable~T~
 
     class LimitedTable~T extends Table~ {
         -origin T
         -limit int
-        + origin() T
     }
-    LimitedTable ..|> Table
+    LimitedTable ..|> WrapedTable~T~
 
     class OffsetTable~T extends Table~ {
         -origin T
         -offset int
-        + origin() T
     }
-    OffsetTable ..|> Table
+    OffsetTable ..|> WrapedTable~T~
 
     class DistinctTable~T extends Table~ {
         -origin T
-        + origin() T
     }
-    DistinctTable ..|> Table
+    DistinctTable ..|> WrapedTable~T~
 ```
 
 ```mermaid
