@@ -14,12 +14,6 @@ classDiagram
         + origin() T
     }
     WrapedTable ..|> Table
-
-    class AliasedTable~T extends Table~ {
-        -origin T
-        -alias String
-    }
-    AliasedTable ..|> WrapedTable~T~
 ```
 
 ```mermaid
@@ -88,7 +82,6 @@ classDiagram
 
     class SubqueryTable~T extends FilterableTable~ {
         -query Query
-        + query() Query
     }
     SubqueryTable ..|> FilterableTable
 ```
@@ -210,12 +203,40 @@ classDiagram
 
 ```mermaid
 classDiagram
-    %% подумать над механизмом кодирования в SQL
-    %% сейчас я думаю что нужен интерфейс QueryPart : content() String, которые будет реализовываться всем попало
-    %% ну или просто оверайдить toString()
+    class QueryPart {
+        <<interface>>
+        + sql() String
+    }
+
+    class Table {
+        <<interface>>
+    }
+    Table ..|> QueryPart
+
+    class Expression {
+        <<interface>>
+    }
+    Expression ..|> QueryPart
+
+    class Condition {
+        <<interface>>
+    }
+    Condition ..|> QueryPart
+
+    class Columns {
+        <<interface>>
+    }
+    Columns ..|> QueryPart
+
+    class JoinRule {
+        <<interface>>
+    }
+    JoinRule ..|> QueryPart
+
     class Query {
         <<interface>>
     }
+    Query ..|> QueryPart
 
     class SelectQuery {
         -columns Columns
