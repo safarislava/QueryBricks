@@ -223,7 +223,7 @@ classDiagram
     class Function {
         <<interface>>
     }
-    Function ..|> Value
+    Function ..|> Expression
 
     class Now
     Now ..|> Function
@@ -231,21 +231,21 @@ classDiagram
     class BinaryOperator {
         <<interface>>
     }
-    BinaryOperator ..|> Value
+    BinaryOperator ..|> Expression
 
     class Addition {
-        -left Value
-        -right Value
+        -left Expression
+        -right Expression
     }
     Addition ..|> BinaryOperator
-    Addition --> Value
+    Addition --> Expression
 
     class Subtraction {
-        -left Value
-        -right Value
+        -left Expression
+        -right Expression
     }
     Subtraction ..|> BinaryOperator
-    Subtraction --> Value
+    Subtraction --> Expression
 ```
 
 ```mermaid
@@ -266,17 +266,17 @@ classDiagram
         <<interface>>
     }
 
-    class ColumnValue {
+    class ColumnExpression {
         -column Column
         -value Expression
     }
-    ColumnValue --> Column
-    ColumnValue --> Expression
+    ColumnExpression --> Column
+    ColumnExpression --> Expression
 
     class InsertRow {
-        -values List~ColumnValue~
+        -values List~ColumnExpression~
     }
-    InsertRow --> ColumnValue
+    InsertRow --> ColumnExpression
 
     class InsertQuery {
         -table Table
@@ -301,19 +301,19 @@ classDiagram
         <<interface>>
     }
 
-    class ColumnValue {
+    class ColumnExpression {
         -column Column
         -value Expression
     }
 
     class UpdateQuery {
         -table Table
-        -assignments List~ColumnValue~
+        -assignments List~ColumnExpression~
         -condition Condition
     }
     UpdateQuery ..|> Query
     UpdateQuery --> Table
-    UpdateQuery --> ColumnValue
+    UpdateQuery --> ColumnExpression
     UpdateQuery --> Condition
 ```
     
@@ -340,7 +340,7 @@ classDiagram
     DeleteQuery --> Condition
 ```
 
-# Пример запроса кода
+# Пример кода
 ## Схема данных
 
 ```java
@@ -373,7 +373,7 @@ class DbOrdersTable implements OrdersTable {
 }
 ```
 
-## Select query
+## Запрос SELECT
 ```java
 UsersTable  users  = new DbUsersTable("users");
 OrdersTable orders = new DbOrdersTable("orders");
@@ -410,7 +410,7 @@ WHERE users.status = 'active'
 LIMIT 10
 ```
 
-## Aggregate query
+## Запрос SELECT c агрегирующей функцией
 
 ```java
 UsersTable  users  = new DbUsersTable("users");
@@ -441,7 +441,7 @@ JOIN orders ON users.id = orders.user_id
 GROUP BY users.status
 ```
 
-## Insert query
+## Запрос INSERT
 
 ```java
 UsersTable users = new DbUsersTable("users");
@@ -450,10 +450,10 @@ Query insert = new InsertQuery(
     users,
     List.of(
         new InsertRow(
-            new ColumnValue(users.id(),        new NumberLiteral(1)),
-            new ColumnValue(users.username(),  new StringLiteral("john")),
-            new ColumnValue(users.status(),    new StringLiteral("active")),
-            new ColumnValue(users.createdAt(), new Now())
+            new ColumnExpression(users.id(),        new NumberLiteral(1)),
+            new ColumnExpression(users.username(),  new StringLiteral("john")),
+            new ColumnExpression(users.status(),    new StringLiteral("active")),
+            new ColumnExpression(users.createdAt(), new Now())
         )
     )
 );
@@ -464,7 +464,7 @@ Query insert = new InsertQuery(
 INSERT INTO users (id, username, status, created_at) VALUES (1, 'john', 'active', NOW())
 ```
 
-## Update query
+## Запрос UPDATE
 
 ```java
 UsersTable users = new DbUsersTable("users");
@@ -472,7 +472,7 @@ UsersTable users = new DbUsersTable("users");
 Query update = new UpdateQuery(
     users,
     List.of(
-        new ColumnValue(users.status(), new StringLiteral("inactive"))
+        new ColumnExpression(users.status(), new StringLiteral("inactive"))
     ),
     new Equals(users.id(), new NumberLiteral(1))
 );
@@ -483,7 +483,7 @@ Query update = new UpdateQuery(
 UPDATE users SET status = 'inactive' WHERE id = 1
 ```
 
-## Delete query
+## Запрос DELETE
 
 ```java
 UsersTable users = new DbUsersTable("users");
