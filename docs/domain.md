@@ -8,6 +8,12 @@ classDiagram
         <<interface>>
     }
     FilterableTable ..|> Table
+
+    class WrapedTable~T extends Table~ {
+        <<interface>>
+        + origin() T
+    }
+    WrapedTable ..|> Table
 ```
 
 ```mermaid
@@ -30,14 +36,19 @@ classDiagram
     }
     LeftJoin ..|> JoinRule
 
+    class BinaryTable~L, R~ {
+        <<interface>>
+        + left() L
+        + right() R
+    }
+
     class JoinedTable~L, R~ {
         -left L
         -right R
         -rule JoinRule
-        + left() L
-        + right() R
     }
     JoinedTable ..|> FilterableTable
+    JoinedTable ..|> BinaryTable~L, R~
     JoinedTable --> JoinRule
 ```
 
@@ -56,17 +67,21 @@ classDiagram
         <<interface>>
     }
 
+    class WrapedTable~T extends Table~ {
+        <<interface>>
+        + origin() T
+    }
+    WrapedTable ..|> Table
+
     class FilteredTable~T extends FilterableTable~ {
         -origin T
         -condition Condition
-        + origin() T
     }
-    FilteredTable ..|> Table
+    FilteredTable ..|> WrapedTable~T~
     FilteredTable --> Condition
 
     class SubqueryTable~T extends FilterableTable~ {
         -query Query
-        + query() Query
     }
     SubqueryTable ..|> FilterableTable
 ```
@@ -82,39 +97,41 @@ classDiagram
     }
     HavableTable ..|> Table
 
+    class WrapedTable~T extends Table~ {
+        <<interface>>
+        + origin() T
+    }
+    WrapedTable ..|> Table
+
     class GroupedTable~T extends Table~ {
         -origin T
         -by List~Column~
-        + origin() T
     }
     GroupedTable ..|> HavableTable
+    GroupedTable ..|> WrapedTable~T~
 
     class HavingTable~T extends HavableTable~ {
         -origin T
         -condition Condition
-        + origin() T
     }
-    HavingTable ..|> Table
+    HavingTable ..|> WrapedTable~T~
 
     class LimitedTable~T extends Table~ {
         -origin T
         -limit int
-        + origin() T
     }
-    LimitedTable ..|> Table
+    LimitedTable ..|> WrapedTable~T~
 
     class OffsetTable~T extends Table~ {
         -origin T
         -offset int
-        + origin() T
     }
-    OffsetTable ..|> Table
+    OffsetTable ..|> WrapedTable~T~
 
     class DistinctTable~T extends Table~ {
         -origin T
-        + origin() T
     }
-    DistinctTable ..|> Table
+    DistinctTable ..|> WrapedTable~T~
 ```
 
 ```mermaid
@@ -123,42 +140,53 @@ classDiagram
         <<interface>>
     }
 
-    class Column {
+    class Column~T~ {
         <<interface>>
     }
     Column ..|> Expression
 
-    class DbColumn {
-        -tableAlias String
+    class DbColumn~T~ {
         -name String
     }
-    DbColumn ..|> Column
+    DbColumn ..|> Column~T~
 
-    class AggregatedColumn {
+    class Table {
         <<interface>>
     }
-    AggregatedColumn ..|> Column
 
-    class Sum {
-        -column Column
+    class TableColumn~T~ {
+        -table Table
+        -column Column~T~
     }
-    Sum ..|> AggregatedColumn
+    TableColumn ..|> Column~T~
+    TableColumn --> Column
+    TableColumn --> Table
 
-    class Count {
-        -column Column
+    class AggregatedColumn~T~ {
+        <<interface>>
     }
-    Count ..|> AggregatedColumn
+    AggregatedColumn ..|> Column~T~
 
-    class Avg {
-        -column Column
+    class Sum~T~ {
+        -column Column~T~
     }
-    Avg ..|> AggregatedColumn
+    Sum ..|> AggregatedColumn~T~
 
-    class AliasedColumn {
-        -origin Column
+    class Count~T~ {
+        -column Column~T~
+    }
+    Count ..|> AggregatedColumn~T~
+
+    class Avg~T~ {
+        -column Column~T~
+    }
+    Avg ..|> AggregatedColumn~T~
+
+    class AliasedColumn~T~ {
+        -origin Column~T~
         -alias String
     }
-    AliasedColumn ..|> Column
+    AliasedColumn ..|> Column~T~
 
     class Columns {
         <<interface>>
@@ -175,20 +203,46 @@ classDiagram
 
 ```mermaid
 classDiagram
-    %% подумать над механизмом кодирования в SQL
-    %% сейчас я думаю что нужен интерфейс QueryPart : content() String, которые будет реализовываться всем попало
-    %% ну или просто оверайдить toString()
+    class QueryPart {
+        <<interface>>
+        + sql() String
+    }
+
+    class Table {
+        <<interface>>
+    }
+    Table ..|> QueryPart
+
+    class Expression {
+        <<interface>>
+    }
+    Expression ..|> QueryPart
+
+    class Condition {
+        <<interface>>
+    }
+    Condition ..|> QueryPart
+
+    class Columns {
+        <<interface>>
+    }
+    Columns ..|> QueryPart
+
+    class JoinRule {
+        <<interface>>
+    }
+    JoinRule ..|> QueryPart
+
     class Query {
         <<interface>>
     }
+    Query ..|> QueryPart
 
     class SelectQuery {
         -columns Columns
         -table Table
     }
     SelectQuery ..|> Query
-    
-    %% алиасы для таблиц
 ```
 
 ```mermaid
@@ -340,41 +394,86 @@ classDiagram
     DeleteQuery --> Condition
 ```
 
+```mermaid
+classDiagram
+    class Query {
+        <<interface>>
+    }
+
+    class Database {
+        <<interface>>
+        + execute(String)
+        + value(Query, Factory~T~) List~T~
+    }
+    Database --> Query
+    Database --> Factory
+
+    class Rows {
+        <<interface>>
+        + list() List~Row~
+    }
+
+    class Column~T~ {
+        <<interface>>
+    }
+
+    class Row {
+        <<interface>>
+        + value(Column~T~) T
+    }
+    Row --> Column
+
+    class Factory~T~ {
+        <<interface>>
+        + product(Row) T
+    }
+
+    class QueryResult~T~ {
+        -rows Rows
+        -factory Factory~T~
+        + value() List~T~
+    }
+    QueryResult --> Rows
+    QueryResult --> Factory
+```
+
 # Пример кода
 ## Схема данных
 
 ```java
 interface UsersTable extends FilterableTable {
-    Column id();
-    Column username();
-    Column status();
-    Column createdAt();
+    Column<Long> id();
+    Column<String> username();
+    Column<String> status();
+    Column<Instant> createdAt();
 }
 
 interface OrdersTable extends FilterableTable {
-    Column userId();
-    Column amount();
+    Column<Long> userId();
+    Column<BigDecimal> amount();
 }
 
 class DbUsersTable implements UsersTable {
     private final String name;
     DbUsersTable(String name) { this.name = name; }
-    public Column id()        { return new DbColumn(name, "id"); }
-    public Column username()  { return new DbColumn(name, "username"); }
-    public Column status()    { return new DbColumn(name, "status"); }
-    public Column createdAt() { return new DbColumn(name, "created_at"); }
+    public Column<Long> id()        { return new TableColumn<>(this, new DbColumn<>("id")); }
+    public Column<String> username()  { return new TableColumn<>(this, new DbColumn<>("username")); }
+    public Column<String> status()    { return new TableColumn<>(this, new DbColumn<>("status")); }
+    public Column<Instant> createdAt() { return new TableColumn<>(this, new DbColumn<>("created_at")); }
 }
 
 class DbOrdersTable implements OrdersTable {
     private final String name;
     DbOrdersTable(String name) { this.name = name; }
-    public Column userId() { return new DbColumn(name, "user_id"); }
-    public Column amount() { return new DbColumn(name, "amount"); }
+    public Column<Long> userId() { return new TableColumn<>(this, new DbColumn<>("user_id")); }
+    public Column<BigDecimal> amount() { return new TableColumn<>(this, new DbColumn<>("amount")); }
 }
 ```
 
 ## Запрос SELECT
 ```java
+record UserOrderSummary(long id, String username, BigDecimal amount) {}
+
 UsersTable  users  = new DbUsersTable("users");
 OrdersTable orders = new DbOrdersTable("orders");
 
@@ -391,14 +490,19 @@ var filtered = new FilteredTable<>(
 
 var limited = new LimitedTable<>(filtered, 10);
 
+Column<Long>       id       = limited.origin().origin().left().id();
+Column<String>     username = limited.origin().origin().left().username();
+Column<BigDecimal> amount   = limited.origin().origin().right().amount();
+
+Factory<UserOrderSummary> factory = row ->
+    new UserOrderSummary(row.value(id), row.value(username), row.value(amount));
+
 Query query = new SelectQuery(
-    new ColumnsSelection(
-        limited.origin().origin().left().id(),
-        limited.origin().origin().left().username(),
-        limited.origin().origin().right().amount()
-    ),
+    new ColumnsSelection(id, username, amount),
     limited
 );
+
+List<UserOrderSummary> result = database.value(query, factory);
 ```
 
 ### Итоговый SQL
@@ -413,6 +517,8 @@ LIMIT 10
 ## Запрос SELECT c агрегирующей функцией
 
 ```java
+record StatusTotal(String status, BigDecimal totalAmount) {}
+
 UsersTable  users  = new DbUsersTable("users");
 OrdersTable orders = new DbOrdersTable("orders");
 
@@ -424,13 +530,18 @@ var joined = new JoinedTable<>(
 
 var grouped = new GroupedTable<>(joined, joined.left().status());
 
+Column<String>     status      = grouped.origin().left().status();
+Column<BigDecimal> totalAmount = new AliasedColumn<>(new Sum<>(grouped.origin().right().amount()), "total_amount");
+
+Factory<StatusTotal> factory = row ->
+    new StatusTotal(row.value(status), row.value(totalAmount));
+
 Query query = new SelectQuery(
-    new ColumnsSelection(
-        grouped.origin().left().status(),
-        new AliasedColumn(new Sum(grouped.origin().right().amount()), "total_amount")
-    ),
+    new ColumnsSelection(status, totalAmount),
     grouped
 );
+
+List<StatusTotal> result = database.value(query, factory);
 ```
 
 ### Итоговый SQL
@@ -457,6 +568,8 @@ Query insert = new InsertQuery(
         )
     )
 );
+
+database.execute(insert.sql());
 ```
 
 ### Итоговый SQL
@@ -476,6 +589,8 @@ Query update = new UpdateQuery(
     ),
     new Equals(users.id(), new NumberLiteral(1))
 );
+
+database.execute(update.sql());
 ```
 
 ### Итоговый SQL
@@ -492,6 +607,8 @@ Query delete = new DeleteQuery(
     users,
     new Equals(users.id(), new NumberLiteral(1))
 );
+
+database.execute(delete.sql());
 ```
 
 ### Итоговый SQL
