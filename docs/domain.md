@@ -1,25 +1,18 @@
 ```mermaid
 classDiagram
-    class Table~C~ {
+    class Table {
         <<interface>>
-        + schema() C
     }
 
-    class FilterableTable~C~ {
+    class FilterableTable {
         <<interface>>
     }
     FilterableTable ..|> Table
-
-    class DbTable~C~ {
-        -name String
-        -schema C
-    }
-    DbTable ..|> FilterableTable
 ```
 
 ```mermaid
 classDiagram
-    class FilterableTable~C~ {
+    class FilterableTable {
         <<interface>>
     }
 
@@ -27,88 +20,145 @@ classDiagram
         <<interface>>
     }
 
-    class InnerJoin
+    class InnerJoin {
+        -on Condition
+    }
     InnerJoin ..|> JoinRule
-    class LeftJoin
+
+    class LeftJoin {
+        -on Condition
+    }
     LeftJoin ..|> JoinRule
 
-    class JoinedSchema~LC, RC~ {
-        + left() LC
-        + right() RC
-    }
-
-    class JoinedTable~LC, RC~ {
-        -left Table~LC~
-        -right Table~RC~
+    class JoinedTable~L, R~ {
+        -left L
+        -right R
         -rule JoinRule
+        + left() L
+        + right() R
     }
     JoinedTable ..|> FilterableTable
     JoinedTable --> JoinRule
-    JoinedTable --> JoinedSchema
 ```
 
 ```mermaid
 classDiagram
-    class FilterableTable~C~ {
+    class Table {
         <<interface>>
     }
+
+    class FilterableTable {
+        <<interface>>
+    }
+    FilterableTable ..|> Table
 
     class Condition {
         <<interface>>
     }
 
-    class Equals
-    Equals ..|> Condition
-    class And
-    And ..|> Condition
-
-    class ConditionFilteredTable~C~ {
-        -origin FilterableTable~C~
+    class FilteredTable~T extends FilterableTable~ {
+        -origin T
         -condition Condition
+        + origin() T
     }
-    ConditionFilteredTable ..|> FilterableTable
-    ConditionFilteredTable --> Condition
+    FilteredTable ..|> Table
+    FilteredTable --> Condition
+
+    class SubqueryTable~T extends FilterableTable~ {
+        -query Query
+        + query() Query
+    }
+    SubqueryTable ..|> FilterableTable
 ```
 
 ```mermaid
 classDiagram
-    class Table~C~ {
+    class Table {
         <<interface>>
     }
 
-    class GroupedTable~C~
-    GroupedTable ..|> Table
+    class HavableTable {
+        <<interface>>
+    }
+    HavableTable ..|> Table
 
-    class LimitedTable~C~
+    class GroupedTable~T extends Table~ {
+        -origin T
+        -by List~Column~
+        + origin() T
+    }
+    GroupedTable ..|> HavableTable
+
+    class HavingTable~T extends HavableTable~ {
+        -origin T
+        -condition Condition
+        + origin() T
+    }
+    HavingTable ..|> Table
+
+    class LimitedTable~T extends Table~ {
+        -origin T
+        -limit int
+        + origin() T
+    }
     LimitedTable ..|> Table
 
-    class OffsetTable~C~
+    class OffsetTable~T extends Table~ {
+        -origin T
+        -offset int
+        + origin() T
+    }
     OffsetTable ..|> Table
 
-    class DistinctTable~C~
+    class DistinctTable~T extends Table~ {
+        -origin T
+        + origin() T
+    }
     DistinctTable ..|> Table
-
-    %% спроектировать HAVING
 ```
 
 ```mermaid
 classDiagram
+    class Expression {
+        <<interface>>
+    }
+
     class Column {
         <<interface>>
     }
+    Column ..|> Expression
 
-    class DbColumn
+    class DbColumn {
+        -tableAlias String
+        -name String
+    }
     DbColumn ..|> Column
 
-    class AggregatedColumn
+    class AggregatedColumn {
+        <<interface>>
+    }
     AggregatedColumn ..|> Column
+
+    class Sum {
+        -column Column
+    }
+    Sum ..|> AggregatedColumn
+
+    class Count {
+        -column Column
+    }
+    Count ..|> AggregatedColumn
+
+    class Avg {
+        -column Column
+    }
+    Avg ..|> AggregatedColumn
 
     class AliasedColumn {
         -origin Column
         -alias String
     }
     AliasedColumn ..|> Column
-    AliasedColumn --> Column
 
     class Columns {
         <<interface>>
@@ -121,49 +171,36 @@ classDiagram
         -columns List~Column~
     }
     ColumnsSelection ..|> Columns
-    ColumnsSelection --> Column
 ```
 
 ```mermaid
 classDiagram
-    class Table~C~ {
+    %% подумать над механизмом кодирования в SQL
+    %% сейчас я думаю что нужен интерфейс QueryPart : content() String, которые будет реализовываться всем попало
+    %% ну или просто оверайдить toString()
+    class Query {
         <<interface>>
     }
 
-    class Columns {
-        <<interface>>
-    }
-
-    class Query~C~ {
-        <<interface>>
-    }
-
-    class SelectDbQuery~C~ {
+    class SelectQuery {
         -columns Columns
-        -table Table~C~
+        -table Table
     }
-    SelectDbQuery ..|> Query
-    SelectDbQuery --> Columns
-    SelectDbQuery --> Table
-
-    class SubqueryTable~C~ {
-        -query Query~C~
-    }
-    SubqueryTable ..|> Table
-
+    SelectQuery ..|> Query
+    
     %% алиасы для таблиц
 ```
 
 ```mermaid
 classDiagram
-    class Value {
+    class Expression {
         <<interface>>
     }
-    
+
     class Literal {
         <<interface>>
     }
-    Literal ..|> Value
+    Literal ..|> Expression
 
     class StringLiteral {
         -value String
@@ -183,25 +220,45 @@ classDiagram
     class NullLiteral
     NullLiteral ..|> Literal
 
-    class FunctionCall {
-        -name String
-        -args List~Value~
+    class Function {
+        <<interface>>
     }
-    FunctionCall ..|> Value
-    FunctionCall --> Value
+    Function ..|> Expression
+
+    class Now
+    Now ..|> Function
+
+    class BinaryOperator {
+        <<interface>>
+    }
+    BinaryOperator ..|> Expression
+
+    class Addition {
+        -left Expression
+        -right Expression
+    }
+    Addition ..|> BinaryOperator
+    Addition --> Expression
+
+    class Subtraction {
+        -left Expression
+        -right Expression
+    }
+    Subtraction ..|> BinaryOperator
+    Subtraction --> Expression
 ```
 
 ```mermaid
 classDiagram
-    class Table~C~ {
+    class Table {
         <<interface>>
     }
     
-    class Query~C~ {
+    class Query {
         <<interface>>
     }
 
-    class Value {
+    class Expression {
         <<interface>>
     }
 
@@ -209,54 +266,34 @@ classDiagram
         <<interface>>
     }
 
-    class ColumnValue {
-        -column Column
-        -value Value
-    }
-    ColumnValue --> Column
-    ColumnValue --> Value
-
-    class InsertRow {
-        -values List~ColumnValue~
-    }
-    InsertRow --> ColumnValue
-
-    class InsertDbQuery~C~ {
-        -table Table~C~
-        -rows List~InsertRow~
-    }
-    InsertDbQuery ..|> Query
-    InsertDbQuery --> Table
-    InsertDbQuery --> InsertRow
-
-```
-
-```mermaid
-classDiagram
-    class ColumnAssignment {
-        <<interface>>
-    }
-    
-    class ColumnValue {
-        -column Column
-        -value Value
-    }
-    ColumnValue ..|> ColumnAssignment
-    
     class ColumnExpression {
         -column Column
-        -expression Expression
+        -value Expression
     }
-    ColumnExpression ..|> ColumnAssignment
+    ColumnExpression --> Column
+    ColumnExpression --> Expression
+
+    class InsertRow {
+        -values List~ColumnExpression~
+    }
+    InsertRow --> ColumnExpression
+
+    class InsertQuery {
+        -table Table
+        -rows List~InsertRow~
+    }
+    InsertQuery ..|> Query
+    InsertQuery --> Table
+    InsertQuery --> InsertRow
 ```
 
 ```mermaid
 classDiagram
-    class Table~C~ {
+    class Table {
         <<interface>>
     }
 
-    class Query~C~ {
+    class Query {
         <<interface>>
     }
 
@@ -264,28 +301,29 @@ classDiagram
         <<interface>>
     }
 
-    class ColumnAssignment {
-        <<interface>>
+    class ColumnExpression {
+        -column Column
+        -value Expression
     }
 
-    class UpdateDbQuery~C~ {
-        -table Table~C~
-        -assignments List~ColumnAssignment~
+    class UpdateQuery {
+        -table Table
+        -assignments List~ColumnExpression~
         -condition Condition
     }
-    UpdateDbQuery ..|> Query
-    UpdateDbQuery --> Table
-    UpdateDbQuery --> ColumnAssignment
-    UpdateDbQuery --> Condition
+    UpdateQuery ..|> Query
+    UpdateQuery --> Table
+    UpdateQuery --> ColumnExpression
+    UpdateQuery --> Condition
 ```
     
 ```mermaid
 classDiagram
-    class Table~C~ {
+    class Table {
         <<interface>>
     }
 
-    class Query~C~ {
+    class Query {
         <<interface>>
     }
 
@@ -293,56 +331,71 @@ classDiagram
         <<interface>>
     }
 
-    class DeleteDbQuery~C~ {
-        -table Table~C~
+    class DeleteQuery {
+        -table Table
         -condition Condition
     }
-    DeleteDbQuery ..|> Query
-    DeleteDbQuery --> Table
-    DeleteDbQuery --> Condition
+    DeleteQuery ..|> Query
+    DeleteQuery --> Table
+    DeleteQuery --> Condition
 ```
 
-# Пример запроса кода
+# Пример кода
 ## Схема данных
 
-<!-- Это компросисс на который прошлось пойти ради статической типизации. -->
 ```java
-class UsersSchema {
-    final Column id        = new DbColumn("id");
-    final Column username  = new DbColumn("username");
-    final Column status    = new DbColumn("status");
-    final Column createdAt = new DbColumn("created_at");
+interface UsersTable extends FilterableTable {
+    Column id();
+    Column username();
+    Column status();
+    Column createdAt();
 }
 
-class OrdersSchema {
-    final Column userId = new DbColumn("user_id");
-    final Column amount = new DbColumn("amount");
+interface OrdersTable extends FilterableTable {
+    Column userId();
+    Column amount();
+}
+
+class DbUsersTable implements UsersTable {
+    private final String name;
+    DbUsersTable(String name) { this.name = name; }
+    public Column id()        { return new DbColumn(name, "id"); }
+    public Column username()  { return new DbColumn(name, "username"); }
+    public Column status()    { return new DbColumn(name, "status"); }
+    public Column createdAt() { return new DbColumn(name, "created_at"); }
+}
+
+class DbOrdersTable implements OrdersTable {
+    private final String name;
+    DbOrdersTable(String name) { this.name = name; }
+    public Column userId() { return new DbColumn(name, "user_id"); }
+    public Column amount() { return new DbColumn(name, "amount"); }
 }
 ```
 
-## Select query
+## Запрос SELECT
 ```java
-Table<UsersSchema>  users  = new DbTable<>("users",  new UsersSchema());
-Table<OrdersSchema> orders = new DbTable<>("orders", new OrdersSchema());
+UsersTable  users  = new DbUsersTable("users");
+OrdersTable orders = new DbOrdersTable("orders");
 
-Table<JoinedScema<UsersSchema, OrdersSchema>> joined = new JoinedTable<>(
+var joined = new JoinedTable<>(
     users,
     orders,
-    new InnerJoin(users.schema().id, orders.schema().userId)
+    new InnerJoin(new Equals(users.id(), orders.userId()))
 );
 
-Table<JoinedScema<UsersSchema, OrdersSchema>> filtered = new ConditionFiltedTable<>(
+var filtered = new FilteredTable<>(
     joined,
-    new Equals(joined.schema().left().status, new StringLiteral("active"))
+    new Equals(joined.left().status(), new StringLiteral("active"))
 );
 
-Table<JoinedScema<UsersSchema, OrdersSchema>> limited = new LimitedTable<>(filtered, 10);
+var limited = new LimitedTable<>(filtered, 10);
 
-Query<?> query = new SelectDbQuery<>(
+Query query = new SelectQuery(
     new ColumnsSelection(
-        joined.schema().left().id,
-        joined.schema().left().username,
-        joined.schema().right().amount
+        limited.origin().origin().left().id(),
+        limited.origin().origin().left().username(),
+        limited.origin().origin().right().amount()
     ),
     limited
 );
@@ -357,30 +410,24 @@ WHERE users.status = 'active'
 LIMIT 10
 ```
 
-## Aggregate query
+## Запрос SELECT c агрегирующей функцией
 
 ```java
-Table<UsersSchema>  users  = new DbTable<>("users",  new UsersSchema());
-Table<OrdersSchema> orders = new DbTable<>("orders", new OrdersSchema());
+UsersTable  users  = new DbUsersTable("users");
+OrdersTable orders = new DbOrdersTable("orders");
 
-Table<JoinedScema<UsersSchema, OrdersSchema>> joined = new JoinedTable<>(
-        users,
-        orders,
-        new InnerJoin(users.schema().id, orders.schema().userId)
+var joined = new JoinedTable<>(
+    users,
+    orders,
+    new InnerJoin(new Equals(users.id(), orders.userId()))
 );
 
-Table<JoinedSchema<UsersSchema, OrdersSchema>> grouped = new GroupedTable<>(
-    joined,
-    joined.schema().left().status
-);
+var grouped = new GroupedTable<>(joined, joined.left().status());
 
-Query<?> query = new SelectDbQuery<>(
+Query query = new SelectQuery(
     new ColumnsSelection(
-        joined.schema().left().status,
-        new AliasedColumn(
-                new AggregatedColumn("SUM", joined.schema().right().amount), 
-                "total_amount"
-        )
+        grouped.origin().left().status(),
+        new AliasedColumn(new Sum(grouped.origin().right().amount()), "total_amount")
     ),
     grouped
 );
@@ -394,19 +441,19 @@ JOIN orders ON users.id = orders.user_id
 GROUP BY users.status
 ```
 
-## Insert query
+## Запрос INSERT
 
 ```java
-DbTable<UsersSchema> users = new DbTable<>("users", new UsersSchema());
+UsersTable users = new DbUsersTable("users");
 
-Query<?> insert = new InsertDbQuery<>(
+Query insert = new InsertQuery(
     users,
     List.of(
         new InsertRow(
-            new ColumnValue(users.schema().id,        new NumberLiteral(1)),
-            new ColumnValue(users.schema().username,  new StringLiteral("john")),
-            new ColumnValue(users.schema().status,    new StringLiteral("active")),
-            new ColumnValue(users.schema().createdAt, new FunctionCall("NOW"))
+            new ColumnExpression(users.id(),        new NumberLiteral(1)),
+            new ColumnExpression(users.username(),  new StringLiteral("john")),
+            new ColumnExpression(users.status(),    new StringLiteral("active")),
+            new ColumnExpression(users.createdAt(), new Now())
         )
     )
 );
@@ -417,17 +464,17 @@ Query<?> insert = new InsertDbQuery<>(
 INSERT INTO users (id, username, status, created_at) VALUES (1, 'john', 'active', NOW())
 ```
 
-## Update query
+## Запрос UPDATE
 
 ```java
-DbTable<UsersSchema> users = new DbTable<>("users", new UsersSchema());
+UsersTable users = new DbUsersTable("users");
 
-Query<?> update = new UpdateDbQuery<>(
+Query update = new UpdateQuery(
     users,
     List.of(
-        new ColumnValue(users.schema().status, new StringLiteral("inactive"))
+        new ColumnExpression(users.status(), new StringLiteral("inactive"))
     ),
-    new Equals(users.schema().id, new NumberLiteral(1))
+    new Equals(users.id(), new NumberLiteral(1))
 );
 ```
 
@@ -436,14 +483,14 @@ Query<?> update = new UpdateDbQuery<>(
 UPDATE users SET status = 'inactive' WHERE id = 1
 ```
 
-## Delete query
+## Запрос DELETE
 
 ```java
-DbTable<UsersSchema> users = new DbTable<>("users", new UsersSchema());
+UsersTable users = new DbUsersTable("users");
 
-Query<?> delete = new DeleteDbQuery<>(
+Query delete = new DeleteQuery(
     users,
-    new Equals(users.schema().id, new NumberLiteral(1))
+    new Equals(users.id(), new NumberLiteral(1))
 );
 ```
 
