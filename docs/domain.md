@@ -1,3 +1,7 @@
+# Доменная модель
+
+## Иерархия основных таблиц
+
 ```mermaid
 classDiagram
     class Table {
@@ -9,12 +13,27 @@ classDiagram
     }
     FilterableTable ..|> Table
 
+    class HavableTable {
+        <<interface>>
+    }
+    HavableTable ..|> Table
+
     class WrapedTable~T extends Table~ {
         <<interface>>
         + origin() T
     }
     WrapedTable ..|> Table
+    WrapedTable --> Table
+
+    class BinaryTable~L, R~ {
+        <<interface>>
+        + left() L
+        + right() R
+    }
+    BinaryTable --> Table
 ```
+
+## Соединение таблиц
 
 ```mermaid
 classDiagram
@@ -52,6 +71,8 @@ classDiagram
     JoinedTable --> JoinRule
 ```
 
+## Фильтрация и подзапросы
+
 ```mermaid
 classDiagram
     class Table {
@@ -86,22 +107,18 @@ classDiagram
     SubqueryTable ..|> FilterableTable
 ```
 
+## Группировка
+
 ```mermaid
 classDiagram
-    class Table {
-        <<interface>>
-    }
-
     class HavableTable {
         <<interface>>
     }
-    HavableTable ..|> Table
 
     class WrapedTable~T extends Table~ {
         <<interface>>
         + origin() T
     }
-    WrapedTable ..|> Table
 
     class GroupedTable~T extends Table~ {
         -origin T
@@ -115,6 +132,16 @@ classDiagram
         -condition Condition
     }
     HavingTable ..|> WrapedTable~T~
+```
+
+## Модификаторы
+
+```mermaid
+classDiagram
+    class WrapedTable~T extends Table~ {
+        <<interface>>
+        + origin() T
+    }
 
     class LimitedTable~T extends Table~ {
         -origin T
@@ -133,6 +160,8 @@ classDiagram
     }
     DistinctTable ..|> WrapedTable~T~
 ```
+
+## Колонки и их выборка
 
 ```mermaid
 classDiagram
@@ -201,6 +230,8 @@ classDiagram
     ColumnsSelection ..|> Columns
 ```
 
+## Рендеринг в SQL
+
 ```mermaid
 classDiagram
     class QueryPart {
@@ -237,13 +268,9 @@ classDiagram
         <<interface>>
     }
     Query ..|> QueryPart
-
-    class SelectQuery {
-        -columns Columns
-        -table Table
-    }
-    SelectQuery ..|> Query
 ```
+
+## Выражения
 
 ```mermaid
 classDiagram
@@ -302,6 +329,31 @@ classDiagram
     Subtraction --> Expression
 ```
 
+## Структура запроса SELECT
+
+```mermaid
+classDiagram
+    class Table {
+        <<interface>>
+    }
+
+    class Query {
+        <<interface>>
+    }
+
+    class Columns {
+        <<interface>>
+    }
+
+    class SelectQuery {
+        -columns Columns
+        -table Table
+    }
+    SelectQuery ..|> Query
+```
+
+## Структура запроса INSERT
+
 ```mermaid
 classDiagram
     class Table {
@@ -341,6 +393,8 @@ classDiagram
     InsertQuery --> InsertRow
 ```
 
+## Структура запроса UPDATE
+
 ```mermaid
 classDiagram
     class Table {
@@ -370,7 +424,9 @@ classDiagram
     UpdateQuery --> ColumnExpression
     UpdateQuery --> Condition
 ```
-    
+
+## Структура запроса DELETE
+
 ```mermaid
 classDiagram
     class Table {
@@ -393,6 +449,8 @@ classDiagram
     DeleteQuery --> Table
     DeleteQuery --> Condition
 ```
+
+## Выполнение запроса и интерпретация результата
 
 ```mermaid
 classDiagram
