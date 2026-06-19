@@ -129,10 +129,21 @@ classDiagram
     Column ..|> Expression
 
     class DbColumn {
-        -tableAlias String
         -name String
     }
     DbColumn ..|> Column
+
+    class Table {
+        <<interface>>
+    }
+
+    class TableColumn {
+        -table Table
+        -column Column
+    }
+    TableColumn ..|> Column
+    TableColumn --> Column
+    TableColumn --> Table
 
     class AggregatedColumn {
         <<interface>>
@@ -359,17 +370,17 @@ interface OrdersTable extends FilterableTable {
 class DbUsersTable implements UsersTable {
     private final String name;
     DbUsersTable(String name) { this.name = name; }
-    public Column id()        { return new DbColumn(name, "id"); }
-    public Column username()  { return new DbColumn(name, "username"); }
-    public Column status()    { return new DbColumn(name, "status"); }
-    public Column createdAt() { return new DbColumn(name, "created_at"); }
+    public Column id()        { return new TableColumn(this, new DbColumn("id")); }
+    public Column username()  { return new TableColumn(this, new DbColumn("username")); }
+    public Column status()    { return new TableColumn(this, new DbColumn("status")); }
+    public Column createdAt() { return new TableColumn(this, new DbColumn("created_at")); }
 }
 
 class DbOrdersTable implements OrdersTable {
     private final String name;
     DbOrdersTable(String name) { this.name = name; }
-    public Column userId() { return new DbColumn(name, "user_id"); }
-    public Column amount() { return new DbColumn(name, "amount"); }
+    public Column userId() { return new TableColumn(this, new DbColumn("user_id")); }
+    public Column amount() { return new TableColumn(this, new DbColumn("amount")); }
 }
 ```
 
