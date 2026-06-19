@@ -8,6 +8,13 @@ classDiagram
         <<interface>>
     }
     FilterableTable ..|> Table
+
+    class AliasedTable~T extends Table~ {
+        -origin T
+        -alias String
+        + origin() T
+    }
+    AliasedTable ..|> Table
 ```
 
 ```mermaid
@@ -198,8 +205,6 @@ classDiagram
         -table Table
     }
     SelectQuery ..|> Query
-    
-    %% алиасы для таблиц
 ```
 
 ```mermaid
