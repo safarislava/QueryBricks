@@ -23,14 +23,14 @@ classDiagram
         + origin() T
     }
     WrapedTable ..|> Table
-    WrapedTable --> Table
+    WrapedTable ..> Table
 
     class BinaryTable~L, R~ {
         <<interface>>
         + left() L
         + right() R
     }
-    BinaryTable --> Table
+    BinaryTable ..> Table
 ```
 
 ## Соединение таблиц
@@ -44,6 +44,12 @@ classDiagram
     class JoinRule {
         <<interface>>
     }
+    
+    class Condition {
+        <<interface>>
+    }
+    InnerJoin --> Condition
+    LeftJoin --> Condition
 
     class InnerJoin {
         -on Condition
@@ -69,6 +75,12 @@ classDiagram
     JoinedTable ..|> FilterableTable
     JoinedTable ..|> BinaryTable~L, R~
     JoinedTable --> JoinRule
+
+    class Table {
+        <<interface>>
+    }
+    JoinedTable --> Table
+    BinaryTable ..> Table
 ```
 
 ## Фильтрация и подзапросы
@@ -76,6 +88,10 @@ classDiagram
 ```mermaid
 classDiagram
     class Table {
+        <<interface>>
+    }
+    
+    class Query {
         <<interface>>
     }
 
@@ -104,6 +120,7 @@ classDiagram
     class SubqueryTable~T extends FilterableTable~ {
         -query Query
     }
+    SubqueryTable --> Query
     SubqueryTable ..|> FilterableTable
 ```
 
@@ -460,17 +477,14 @@ classDiagram
 
     class Database {
         <<interface>>
-        + execute(String)
-        + selection(Query) Rows
+        + execute(sql) void
+        + query(query) Rows
     }
-    Database --> Query
-    Database --> Rows
 
     class Rows {
         <<interface>>
         + list() List~Row~
     }
-    Rows --> Row
 
     class Column~T~ {
         <<interface>>
@@ -478,7 +492,11 @@ classDiagram
 
     class Row {
         <<interface>>
-        + value(Column~T~) T
+        + value(column) T
     }
-    Row --> Column
+
+    Database ..> Query
+    Database ..> Rows
+    Rows o-- Row 
+    Row ..> Column
 ```
