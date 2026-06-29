@@ -23,11 +23,9 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
-        with:
-          gradle-version: "8.14.1"
 
       - name: Build and verify coverage
-        run: gradle check
+        run: ./gradlew check
 
       - name: Upload JaCoCo HTML report
         if: always()

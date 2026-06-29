@@ -23,14 +23,14 @@ classDiagram
         + origin() T
     }
     WrapedTable ..|> Table
-    WrapedTable --> Table
+    WrapedTable ..> Table
 
     class BinaryTable~L, R~ {
         <<interface>>
         + left() L
         + right() R
     }
-    BinaryTable --> Table
+    BinaryTable ..> Table
 ```
 
 ## Соединение таблиц
@@ -43,7 +43,14 @@ classDiagram
 
     class JoinRule {
         <<interface>>
+        + sql(Table) String
     }
+    
+    class Condition {
+        <<interface>>
+    }
+    InnerJoin --> Condition
+    LeftJoin --> Condition
 
     class InnerJoin {
         -on Condition
@@ -69,6 +76,12 @@ classDiagram
     JoinedTable ..|> FilterableTable
     JoinedTable ..|> BinaryTable~L, R~
     JoinedTable --> JoinRule
+
+    class Table {
+        <<interface>>
+    }
+    JoinedTable --> Table
+    BinaryTable ..> Table
 ```
 
 ## Фильтрация и подзапросы
@@ -76,6 +89,10 @@ classDiagram
 ```mermaid
 classDiagram
     class Table {
+        <<interface>>
+    }
+    
+    class Query {
         <<interface>>
     }
 
@@ -104,6 +121,7 @@ classDiagram
     class SubqueryTable~T extends FilterableTable~ {
         -query Query
     }
+    SubqueryTable --> Query
     SubqueryTable ..|> FilterableTable
 ```
 
@@ -259,10 +277,6 @@ classDiagram
     }
     Columns ..|> QueryPart
 
-    class JoinRule {
-        <<interface>>
-    }
-    JoinRule ..|> QueryPart
 
     class Query {
         <<interface>>
@@ -460,11 +474,9 @@ classDiagram
 
     class Database {
         <<interface>>
-        + execute(String)
-        + value(Query, Factory~T~) List~T~
+        + execute(sql) void
+        + query(query) Rows
     }
-    Database --> Query
-    Database --> Factory
 
     class Rows {
         <<interface>>
@@ -477,20 +489,11 @@ classDiagram
 
     class Row {
         <<interface>>
-        + value(Column~T~) T
-    }
-    Row --> Column
-
-    class Factory~T~ {
-        <<interface>>
-        + product(Row) T
+        + value(column) T
     }
 
-    class QueryResult~T~ {
-        -rows Rows
-        -factory Factory~T~
-        + value() List~T~
-    }
-    QueryResult --> Rows
-    QueryResult --> Factory
+    Database ..> Query
+    Database ..> Rows
+    Rows o-- Row 
+    Row ..> Column
 ```
