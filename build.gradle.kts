@@ -1,6 +1,11 @@
 plugins {
     java
     jacoco
+    checkstyle
+}
+
+checkstyle {
+    toolVersion = "10.19.0"
 }
 
 group = "com.querybricks"
