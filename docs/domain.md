@@ -43,6 +43,7 @@ classDiagram
 
     class JoinRule {
         <<interface>>
+        + sql(Table) String
     }
     
     class Condition {
@@ -276,10 +277,6 @@ classDiagram
     }
     Columns ..|> QueryPart
 
-    class JoinRule {
-        <<interface>>
-    }
-    JoinRule ..|> QueryPart
 
     class Query {
         <<interface>>
