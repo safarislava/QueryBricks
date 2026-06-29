@@ -5,16 +5,33 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 final class JoinedTableTest {
+    private final BinaryTable<FakeTable, FakeTable> table = new JoinedTable<>(
+        new FakeTable("users"),
+        new FakeTable("orders"),
+        new FakeJoinRule("INNER JOIN %s ON users.id = orders.user_id")
+    );
 
     @Test
     void testSql() {
         MatcherAssert.assertThat(
-            new JoinedTable<>(
-                new FakeTable("users"),
-                new FakeTable("orders"),
-                new FakeJoinRule("INNER JOIN %s ON users.id = orders.user_id")
-            ).sql(),
+            table.sql(),
             Matchers.equalTo("users INNER JOIN orders ON users.id = orders.user_id")
+        );
+    }
+
+    @Test
+    void testLeft() {
+        MatcherAssert.assertThat(
+            table.left().sql(),
+            Matchers.equalTo("users")
+        );
+    }
+
+    @Test
+    void testRight() {
+        MatcherAssert.assertThat(
+            table.right().sql(),
+            Matchers.equalTo("orders")
         );
     }
 }
