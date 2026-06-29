@@ -1,0 +1,28 @@
+package com.querybricks.table;
+
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+
+final class LimitedTableTest {
+    private final LimitedTable<FakeTable> table = new LimitedTable<>(
+        new FakeTable("users"),
+        10
+    );
+
+    @Test
+    void testSql() {
+        MatcherAssert.assertThat(
+            table.sql(),
+            Matchers.equalTo("users LIMIT 10")
+        );
+    }
+
+    @Test
+    void testOrigin() {
+        MatcherAssert.assertThat(
+            table.origin().sql(),
+            Matchers.equalTo("users")
+        );
+    }
+}
