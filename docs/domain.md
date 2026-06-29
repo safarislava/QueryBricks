@@ -18,12 +18,12 @@ classDiagram
     }
     HavableTable ..|> Table
 
-    class WrapedTable~T extends Table~ {
+    class WrappedTable~T extends Table~ {
         <<interface>>
         + origin() T
     }
-    WrapedTable ..|> Table
-    WrapedTable ..> Table
+    WrappedTable ..|> Table
+    WrappedTable ..> Table
 
     class BinaryTable~L, R~ {
         <<interface>>
@@ -53,12 +53,12 @@ classDiagram
     LeftJoin --> Condition
 
     class InnerJoin {
-        -on Condition
+        -condition Condition
     }
     InnerJoin ..|> JoinRule
 
     class LeftJoin {
-        -on Condition
+        -condition Condition
     }
     LeftJoin ..|> JoinRule
 
@@ -71,7 +71,7 @@ classDiagram
     class JoinedTable~L, R~ {
         -left L
         -right R
-        -rule JoinRule
+        -joinRule JoinRule
     }
     JoinedTable ..|> FilterableTable
     JoinedTable ..|> BinaryTable~L, R~
@@ -105,25 +105,25 @@ classDiagram
         <<interface>>
     }
 
-    class WrapedTable~T extends Table~ {
+    class WrappedTable~T extends Table~ {
         <<interface>>
         + origin() T
     }
-    WrapedTable ..|> Table
+    WrappedTable ..|> Table
 
     class FilteredTable~T extends FilterableTable~ {
-        -origin T
+        -table T
         -condition Condition
     }
-    FilteredTable ..|> WrapedTable~T~
+    FilteredTable ..|> WrappedTable~T~
     FilteredTable --> Condition
 
     class SubqueryTable~T extends FilterableTable~ {
-        -origin T
+        -table T
         -query Query
     }
     SubqueryTable --> Query
-    SubqueryTable ..|> WrapedTable~T~
+    SubqueryTable ..|> WrappedTable~T~
     SubqueryTable ..|> FilterableTable
 ```
 
@@ -135,30 +135,30 @@ classDiagram
         <<interface>>
     }
 
-    class WrapedTable~T extends Table~ {
+    class WrappedTable~T extends Table~ {
         <<interface>>
         + origin() T
     }
 
     class GroupedTable~T extends Table~ {
-        -origin T
-        -by List~Column~
+        -table T
+        -columns Columns
     }
     GroupedTable ..|> HavableTable
-    GroupedTable ..|> WrapedTable~T~
+    GroupedTable ..|> WrappedTable~T~
 
     class HavingTable~T extends HavableTable~ {
-        -origin T
+        -table T
         -condition Condition
     }
-    HavingTable ..|> WrapedTable~T~
+    HavingTable ..|> WrappedTable~T~
 ```
 
 ## Модификаторы
 
 ```mermaid
 classDiagram
-    class WrapedTable~T extends Table~ {
+    class WrappedTable~T extends Table~ {
         <<interface>>
         + origin() T
     }
@@ -167,18 +167,18 @@ classDiagram
         -origin T
         -limit int
     }
-    LimitedTable ..|> WrapedTable~T~
+    LimitedTable ..|> WrappedTable~T~
 
     class OffsetTable~T extends Table~ {
         -origin T
         -offset int
     }
-    OffsetTable ..|> WrapedTable~T~
+    OffsetTable ..|> WrappedTable~T~
 
     class DistinctTable~T extends Table~ {
         -origin T
     }
-    DistinctTable ..|> WrapedTable~T~
+    DistinctTable ..|> WrappedTable~T~
 ```
 
 ## Колонки и их выборка
