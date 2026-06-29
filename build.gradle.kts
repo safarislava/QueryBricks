@@ -24,6 +24,7 @@ repositories {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.11.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.hamcrest:hamcrest:3.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
