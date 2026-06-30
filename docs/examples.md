@@ -146,7 +146,7 @@ UsersTable users = new DbUsersTable("users");
 Query update = new UpdateQuery(
     users,
     List.of(
-        new ColumnExpression(users.status(), new StringLiteral("inactive"))
+        new ColumnAssignment(users.status(), new StringLiteral("inactive"))
     ),
     new Equals(users.id(), new NumberLiteral(1))
 );
