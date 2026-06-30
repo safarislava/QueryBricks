@@ -231,12 +231,6 @@ classDiagram
     }
     Avg ..|> AggregatedColumn~T~
 
-    class AliasedColumn~T~ {
-        -origin Column~T~
-        -alias String
-    }
-    AliasedColumn ..|> Column~T~
-
     class Columns {
         <<interface>>
     }
