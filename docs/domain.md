@@ -425,19 +425,19 @@ classDiagram
         <<interface>>
     }
 
-    class ColumnExpression {
+    class ColumnAssignment {
         -column Column
         -value Expression
     }
 
     class UpdateQuery {
         -table Table
-        -assignments List~ColumnExpression~
+        -assignments List~ColumnAssignment~
         -condition Condition
     }
     UpdateQuery ..|> Query
     UpdateQuery --> Table
-    UpdateQuery --> ColumnExpression
+    UpdateQuery --> ColumnAssignment
     UpdateQuery --> Condition
 ```
 
