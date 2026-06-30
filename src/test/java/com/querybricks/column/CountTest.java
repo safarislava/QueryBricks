@@ -1,0 +1,19 @@
+package com.querybricks.column;
+
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+
+class CountTest {
+    private final Column<Long> column = new Count<>(
+        new DbColumn<>("id")
+    );
+
+    @Test
+    void testSql() {
+        MatcherAssert.assertThat(
+            this.column.sql(),
+            Matchers.equalTo("COUNT(id)")
+        );
+    }
+}
