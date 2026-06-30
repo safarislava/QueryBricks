@@ -25,8 +25,11 @@ public class InsertQuery implements Query {
         if (this.rows.isEmpty()) {
             throw new IllegalStateException("Insert query must have at least one row");
         }
-        String columns = this.columns.stream().map(QueryPart::sql).collect(Collectors.joining(", "));
-        String values = this.rows.stream().map(InsertRow::sql).collect(Collectors.joining(", "));
-        return String.format("INSERT INTO %s (%s) VALUES %s", this.table.sql(), columns, values);
+        return String.format(
+            "INSERT INTO %s (%s) VALUES %s",
+            table.sql(),
+            columns.stream().map(QueryPart::sql).collect(Collectors.joining(", ")),
+            rows.stream().map(InsertRow::sql).collect(Collectors.joining(", "))
+        );
     }
 }

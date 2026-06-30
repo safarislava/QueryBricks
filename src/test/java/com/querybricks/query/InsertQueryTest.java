@@ -1,6 +1,5 @@
 package com.querybricks.query;
 
-import com.querybricks.column.Column;
 import com.querybricks.column.RawColumn;
 import com.querybricks.column.TableColumn;
 import com.querybricks.expression.NumberLiteral;
