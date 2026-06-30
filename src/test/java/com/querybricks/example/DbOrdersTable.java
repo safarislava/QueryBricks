@@ -1,7 +1,7 @@
 package com.querybricks.example;
 
-import com.querybricks.column.Column;
-import com.querybricks.column.DbColumn;
+import com.querybricks.column.BindedColumn;
+import com.querybricks.column.RawColumn;
 import com.querybricks.column.TableColumn;
 
 import java.math.BigDecimal;
@@ -19,12 +19,12 @@ public class DbOrdersTable implements OrdersTable {
     }
 
     @Override
-    public Column<Long> userId() {
-        return new TableColumn<>(this, new DbColumn<>("user_id"));
+    public BindedColumn<Long> userId() {
+        return new TableColumn<>(this, new RawColumn<>("user_id"));
     }
 
     @Override
-    public Column<BigDecimal> amount() {
-        return new TableColumn<>(this, new DbColumn<>("amount"));
+    public BindedColumn<BigDecimal> amount() {
+        return new TableColumn<>(this, new RawColumn<>("amount"));
     }
 }

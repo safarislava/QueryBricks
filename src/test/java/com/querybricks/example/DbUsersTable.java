@@ -1,7 +1,7 @@
 package com.querybricks.example;
 
-import com.querybricks.column.Column;
-import com.querybricks.column.DbColumn;
+import com.querybricks.column.BindedColumn;
+import com.querybricks.column.RawColumn;
 import com.querybricks.column.TableColumn;
 
 public class DbUsersTable implements UsersTable {
@@ -17,17 +17,22 @@ public class DbUsersTable implements UsersTable {
     }
 
     @Override
-    public Column<Long> id() {
-        return new TableColumn<>(this, new DbColumn<>("id"));
+    public BindedColumn<Long> id() {
+        return new TableColumn<>(this, new RawColumn<>("id"));
     }
 
     @Override
-    public Column<String> username() {
-        return new TableColumn<>(this, new DbColumn<>("username"));
+    public BindedColumn<String> username() {
+        return new TableColumn<>(this, new RawColumn<>("username"));
     }
 
     @Override
-    public Column<String> status() {
-        return new TableColumn<>(this, new DbColumn<>("status"));
+    public BindedColumn<String> status() {
+        return new TableColumn<>(this, new RawColumn<>("status"));
+    }
+
+    @Override
+    public BindedColumn<java.time.Instant> createdAt() {
+        return new TableColumn<>(this, new RawColumn<>("created_at"));
     }
 }

@@ -1,6 +1,6 @@
 package com.querybricks.condition;
 
-import com.querybricks.column.DbColumn;
+import com.querybricks.column.RawColumn;
 import com.querybricks.expression.NumberLiteral;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 final class EqualsTest {
     private final Condition condition = new Equals(
-        new DbColumn<>("id"),
+        new RawColumn<>("id"),
         new NumberLiteral(1)
     );
 

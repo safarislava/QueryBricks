@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class SumTest {
     private final Column<Integer> column = new Sum<>(
-        new DbColumn<>("amount")
+        new RawColumn<>("amount")
     );
 
     @Test

@@ -4,8 +4,8 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-class DbColumnTest {
-    private final Column<String> column = new DbColumn<>("username");
+class RawColumnTest {
+    private final Column<String> column = new RawColumn<>("username");
 
     @Test
     void testSql() {
