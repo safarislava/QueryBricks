@@ -1,9 +1,9 @@
 package com.querybricks.column;
 
-public class DbColumn<T> implements Column<T> {
+public class RawColumn<T> implements UnbindedColumn<T> {
     private final String name;
 
-    public DbColumn(String name) {
+    public RawColumn(String name) {
         this.name = name;
     }
 
