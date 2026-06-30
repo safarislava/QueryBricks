@@ -3,31 +3,31 @@
 
 ```java
 interface UsersTable extends FilterableTable {
-    Column<Long> id();
-    Column<String> username();
-    Column<String> status();
-    Column<Instant> createdAt();
+    BindedColumn<Long> id();
+    BindedColumn<String> username();
+    BindedColumn<String> status();
+    BindedColumn<Instant> createdAt();
 }
 
 interface OrdersTable extends FilterableTable {
-    Column<Long> userId();
-    Column<BigDecimal> amount();
+    BindedColumn<Long> userId();
+    BindedColumn<BigDecimal> amount();
 }
 
 class DbUsersTable implements UsersTable {
     private final String name;
     DbUsersTable(String name) { this.name = name; }
-    public Column<Long> id()        { return new TableColumn<>(this, new DbColumn<>("id")); }
-    public Column<String> username()  { return new TableColumn<>(this, new DbColumn<>("username")); }
-    public Column<String> status()    { return new TableColumn<>(this, new DbColumn<>("status")); }
-    public Column<Instant> createdAt() { return new TableColumn<>(this, new DbColumn<>("created_at")); }
+    public BindedColumn<Long> id()        { return new TableColumn<>(this, new RawColumn<>("id")); }
+    public BindedColumn<String> username()  { return new TableColumn<>(this, new RawColumn<>("username")); }
+    public BindedColumn<String> status()    { return new TableColumn<>(this, new RawColumn<>("status")); }
+    public BindedColumn<Instant> createdAt() { return new TableColumn<>(this, new RawColumn<>("created_at")); }
 }
 
 class DbOrdersTable implements OrdersTable {
     private final String name;
     DbOrdersTable(String name) { this.name = name; }
-    public Column<Long> userId() { return new TableColumn<>(this, new DbColumn<>("user_id")); }
-    public Column<BigDecimal> amount() { return new TableColumn<>(this, new DbColumn<>("amount")); }
+    public BindedColumn<Long> userId() { return new TableColumn<>(this, new RawColumn<>("user_id")); }
+    public BindedColumn<BigDecimal> amount() { return new TableColumn<>(this, new RawColumn<>("amount")); }
 }
 ```
 
@@ -119,12 +119,13 @@ UsersTable users = new DbUsersTable("users");
 
 Query insert = new InsertQuery(
     users,
+    List.of(users.id().unbound(), users.username().unbound(), users.status().unbound(), users.createdAt().unbound()),
     List.of(
         new InsertRow(
-            new ColumnExpression(users.id(),        new NumberLiteral(1)),
-            new ColumnExpression(users.username(),  new StringLiteral("john")),
-            new ColumnExpression(users.status(),    new StringLiteral("active")),
-            new ColumnExpression(users.createdAt(), new Now())
+            new NumberLiteral(1),
+            new StringLiteral("john"),
+            new StringLiteral("active"),
+            new Now()
         )
     )
 );

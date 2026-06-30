@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 
 class ColumnsSelectionTest {
     private final Columns columns = new ColumnsSelection(
-        new DbColumn<>("id"),
-        new DbColumn<>("username"),
-        new DbColumn<>("email")
+        new RawColumn<>("id"),
+        new RawColumn<>("username"),
+        new RawColumn<>("email")
     );
 
     @Test

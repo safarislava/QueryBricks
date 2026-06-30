@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class AvgTest {
     private final Column<Double> column = new Avg<>(
-        new DbColumn<>("rating")
+        new RawColumn<>("rating")
     );
 
     @Test

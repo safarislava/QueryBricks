@@ -2,11 +2,11 @@ package com.querybricks.column;
 
 import com.querybricks.table.Table;
 
-public class TableColumn<T> implements Column<T> {
+public class TableColumn<T> implements BoundColumn<T> {
     private final Table table;
-    private final Column<T> column;
+    private final UnboundColumn<T> column;
 
-    public TableColumn(Table table, Column<T> column) {
+    public TableColumn(Table table, UnboundColumn<T> column) {
         this.table = table;
         this.column = column;
     }
@@ -14,5 +14,10 @@ public class TableColumn<T> implements Column<T> {
     @Override
     public String sql() {
         return String.format("%s.%s", this.table.sql(), this.column.sql());
+    }
+
+    @Override
+    public UnboundColumn<T> unbound() {
+        return this.column;
     }
 }

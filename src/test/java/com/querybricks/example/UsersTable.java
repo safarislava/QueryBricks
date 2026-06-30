@@ -1,10 +1,13 @@
 package com.querybricks.example;
 
-import com.querybricks.column.Column;
+import com.querybricks.column.BoundColumn;
 import com.querybricks.table.FilterableTable;
 
+import java.time.Instant;
+
 public interface UsersTable extends FilterableTable {
-    Column<Long> id();
-    Column<String> username();
-    Column<String> status();
+    BoundColumn<Long> id();
+    BoundColumn<String> username();
+    BoundColumn<String> status();
+    BoundColumn<Instant> createdAt();
 }

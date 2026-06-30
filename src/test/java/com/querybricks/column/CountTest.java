@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class CountTest {
     private final Column<Long> column = new Count<>(
-        new DbColumn<>("id")
+        new RawColumn<>("id")
     );
 
     @Test
