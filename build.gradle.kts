@@ -5,7 +5,7 @@ plugins {
 }
 
 checkstyle {
-    toolVersion = "10.19.0"
+    toolVersion = "13.7.0"
 }
 
 group = "com.querybricks"
@@ -13,7 +13,7 @@ version = "0.1.0"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 

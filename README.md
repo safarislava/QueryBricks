@@ -1,7 +1,7 @@
 # QueryBricks
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
-[![Java Version](https://img.shields.io/badge/java-21-blue.svg)](#)
+[![Java Version](https://img.shields.io/badge/java-25-blue.svg)](#)
 [![Paradigm](https://img.shields.io/badge/paradigm-elegant_objects-orange.svg)](#)
 
 **QueryBricks** is a declarative, object-oriented SQL query builder for Java, designed strictly following the **Elegant Objects (EO)** paradigm.
