@@ -1,5 +1,6 @@
 package com.querybricks.column;
 
+import com.querybricks.Bindings;
 import com.querybricks.table.Table;
 import java.util.function.Consumer;
 
@@ -13,6 +14,11 @@ public class AllColumns implements Columns {
     @Override
     public String sql() {
         return "*";
+    }
+
+    @Override
+    public Bindings bind(Bindings bindings) {
+        return this.table.bind(bindings);
     }
 
     @Override
