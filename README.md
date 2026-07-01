@@ -1,7 +1,7 @@
 # QueryBricks
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
-[![Java Version](https://img.shields.io/badge/java-21-blue.svg)](#)
+[![Java Version](https://img.shields.io/badge/java-25-blue.svg)](#)
 [![Paradigm](https://img.shields.io/badge/paradigm-elegant_objects-orange.svg)](#)
 
 **QueryBricks** is a declarative, object-oriented SQL query builder for Java, designed strictly following the **Elegant Objects (EO)** paradigm.
@@ -15,6 +15,7 @@
   * **No Getters/Setters**: Objects do not expose their internal state. You interact with objects exclusively through their behavior.
   * **True Immutability**: All objects are completely immutable once created.
   * **No Static Methods**: All behavior is polymorphic and resides in instance methods.
+  * **No Reflection**: Behavior of all object is predicable, and not distributed across the code.
 * **Declarative**: Queries are built a composition tree of objects.
 * **Dynamic Construction**: Queries are built dynamically, allows to specify existing one.
 * **Lazy SQL Generation**: The SQL string is constructed lazily and generated only on-demand.

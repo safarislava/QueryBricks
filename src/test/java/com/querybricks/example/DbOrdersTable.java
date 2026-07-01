@@ -1,10 +1,12 @@
 package com.querybricks.example;
 
 import com.querybricks.column.BoundColumn;
+import com.querybricks.column.Column;
 import com.querybricks.column.RawColumn;
 import com.querybricks.column.TableColumn;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class DbOrdersTable implements OrdersTable {
     private final String name;
@@ -26,5 +28,10 @@ public class DbOrdersTable implements OrdersTable {
     @Override
     public BoundColumn<BigDecimal> amount() {
         return new TableColumn<>(this, new RawColumn<>("amount"));
+    }
+
+    @Override
+    public List<Column<?>> columns() {
+        return java.util.List.of(userId(), amount());
     }
 }

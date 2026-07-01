@@ -5,8 +5,8 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 final class DistinctTableTest {
-    private final DistinctTable<FakeTable> table = new DistinctTable<>(
-        new FakeTable("users")
+    private final DistinctTable<Table> table = new DistinctTable<>(
+        new FakeFilterableTable("users")
     );
 
     @Test

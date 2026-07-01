@@ -5,7 +5,7 @@ plugins {
 }
 
 checkstyle {
-    toolVersion = "10.19.0"
+    toolVersion = "13.7.0"
 }
 
 group = "com.querybricks"
@@ -13,7 +13,7 @@ version = "0.1.0"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -26,6 +26,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.hamcrest:hamcrest:3.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("com.h2database:h2:2.3.232")
 }
 
 tasks.test {

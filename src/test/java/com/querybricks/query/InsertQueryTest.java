@@ -4,7 +4,8 @@ import com.querybricks.column.RawColumn;
 import com.querybricks.column.TableColumn;
 import com.querybricks.expression.NumberLiteral;
 import com.querybricks.expression.StringLiteral;
-import com.querybricks.table.FakeTable;
+import com.querybricks.table.FakeFilterableTable;
+import com.querybricks.table.Table;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -12,13 +13,15 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 final class InsertQueryTest {
+    private final Table table = new FakeFilterableTable("users");
+    
     @Test
     void testSql() {
         Query query = new InsertQuery(
-            new FakeTable("users"),
+            table,
             List.of(
-                new TableColumn<>(new FakeTable("users"), new RawColumn<>("id")).unbound(),
-                new TableColumn<>(new FakeTable("users"), new RawColumn<>("username")).unbound()
+                new TableColumn<>(table, new RawColumn<>("id")).unbound(),
+                new TableColumn<>(table, new RawColumn<>("username")).unbound()
             ),
             List.of(
                 new InsertRow(
@@ -36,7 +39,7 @@ final class InsertQueryTest {
     @Test
     void testSqlWithEmptyColumns() {
         Query query = new InsertQuery(
-            new FakeTable("users"),
+            table,
             List.of(),
             List.of(
                 new InsertRow(
@@ -58,10 +61,10 @@ final class InsertQueryTest {
     @Test
     void testSqlWithEmptyRows() {
         Query query = new InsertQuery(
-            new FakeTable("users"),
+            table,
             List.of(
-                new TableColumn<>(new FakeTable("users"), new RawColumn<>("id")).unbound(),
-                new TableColumn<>(new FakeTable("users"), new RawColumn<>("username")).unbound()
+                new TableColumn<>(table, new RawColumn<>("id")).unbound(),
+                new TableColumn<>(table, new RawColumn<>("username")).unbound()
             ),
             List.of()
         );

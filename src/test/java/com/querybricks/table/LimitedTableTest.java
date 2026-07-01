@@ -5,8 +5,8 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 final class LimitedTableTest {
-    private final LimitedTable<FakeTable> table = new LimitedTable<>(
-        new FakeTable("users"),
+    private final LimitedTable<Table> table = new LimitedTable<>(
+        new FakeFilterableTable("users"),
         10
     );
 

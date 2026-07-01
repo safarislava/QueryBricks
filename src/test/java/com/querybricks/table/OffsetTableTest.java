@@ -5,8 +5,8 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 final class OffsetTableTest {
-    private final OffsetTable<FakeTable> table = new OffsetTable<>(
-        new FakeTable("users"),
+    private final OffsetTable<Table> table = new OffsetTable<>(
+        new FakeFilterableTable("users"),
         20
     );
 
