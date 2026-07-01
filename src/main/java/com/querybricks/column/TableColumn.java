@@ -19,7 +19,7 @@ public class TableColumn<T> implements BoundColumn<T> {
 
     @Override
     public Bindings bind(Bindings bindings) {
-        return this.column.bind(this.table.bind(bindings));
+        return this.column.bind(bindings);
     }
 
     @Override
