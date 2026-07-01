@@ -15,6 +15,7 @@
   * **No Getters/Setters**: Objects do not expose their internal state. You interact with objects exclusively through their behavior.
   * **True Immutability**: All objects are completely immutable once created.
   * **No Static Methods**: All behavior is polymorphic and resides in instance methods.
+  * **No Reflection**: Behavior of all object is predicable, and not distributed across the code.
 * **Declarative**: Queries are built a composition tree of objects.
 * **Dynamic Construction**: Queries are built dynamically, allows to specify existing one.
 * **Lazy SQL Generation**: The SQL string is constructed lazily and generated only on-demand.
