@@ -7,9 +7,9 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 final class HavingTableTest {
-    private final HavingTable<GroupedTable<FakeTable>> table = new HavingTable<>(
+    private final HavingTable<GroupedTable<Table>> table = new HavingTable<>(
         new GroupedTable<>(
-            new FakeTable("users"),
+            new FakeFilterableTable("users"),
             new FakeColumns("status")
         ),
         new FakeCondition("COUNT(id) > 10")

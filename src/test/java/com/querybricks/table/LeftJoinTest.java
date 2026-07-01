@@ -11,7 +11,7 @@ final class LeftJoinTest {
     void testSql() {
         MatcherAssert.assertThat(
             new LeftJoin(new FakeCondition("users.id = orders.user_id"))
-                .sql(new FakeTable("orders")),
+                .sql(new FakeFilterableTable("orders")),
             Matchers.equalTo("LEFT JOIN orders ON users.id = orders.user_id")
         );
     }

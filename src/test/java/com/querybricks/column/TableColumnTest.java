@@ -1,13 +1,13 @@
 package com.querybricks.column;
 
-import com.querybricks.table.FakeTable;
+import com.querybricks.table.FakeFilterableTable;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 class TableColumnTest {
     private final BoundColumn<Long> column = new TableColumn<>(
-        new FakeTable("users"),
+        new FakeFilterableTable("users"),
         new RawColumn<>("id")
     );
 

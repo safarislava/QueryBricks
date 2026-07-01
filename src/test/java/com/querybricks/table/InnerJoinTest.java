@@ -11,7 +11,7 @@ final class InnerJoinTest {
     void testSql() {
         MatcherAssert.assertThat(
             new InnerJoin(new FakeCondition("users.id = orders.user_id"))
-                .sql(new FakeTable("orders")),
+                .sql(new FakeFilterableTable("orders")),
             Matchers.equalTo("INNER JOIN orders ON users.id = orders.user_id")
         );
     }

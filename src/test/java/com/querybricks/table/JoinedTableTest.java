@@ -5,9 +5,9 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 final class JoinedTableTest {
-    private final BinaryTable<FakeTable, FakeTable> table = new JoinedTable<>(
-        new FakeTable("users"),
-        new FakeTable("orders"),
+    private final BinaryTable<Table, Table> table = new JoinedTable<>(
+        new FakeFilterableTable("users"),
+        new FakeFilterableTable("orders"),
         new FakeJoinRule("INNER JOIN %s ON users.id = orders.user_id")
     );
 

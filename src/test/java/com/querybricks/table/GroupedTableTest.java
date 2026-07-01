@@ -6,8 +6,8 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 final class GroupedTableTest {
-    private final GroupedTable<FakeTable> table = new GroupedTable<>(
-        new FakeTable("users"),
+    private final GroupedTable<Table> table = new GroupedTable<>(
+        new FakeFilterableTable("users"),
         new FakeColumns("status")
     );
 
