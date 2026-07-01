@@ -225,3 +225,60 @@ database.selection(query);
 ```sql
 SELECT username FROM users WHERE EXISTS (SELECT ? FROM (SELECT orders.user_id, orders.amount FROM orders WHERE orders.amount > ?) WHERE orders.user_id = users.id)
 ```
+
+## Выполнение запросов
+
+```java
+import com.querybricks.database.DbPool;
+import com.querybricks.database.DataSourcePool;
+import org.h2.jdbcx.JdbcDataSource;
+
+JdbcDataSource dataSource = new JdbcDataSource();
+dataSource.setUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
+dataSource.setUser("sa");
+dataSource.setPassword("");
+
+DbPool database = new DataSourcePool(dataSource);
+```
+
+### Выполнение запросов на чтение
+
+```java
+ResultedQuery select = new SelectQuery(
+    new ColumnsSelection(users.id(), users.username()),
+    users
+);
+
+List<Row> rows = database.selection(select);
+for (Row row : rows) {
+    Long id = row.value(users.id());
+    String name = row.value(users.username());
+    System.out.println("User: " + id + " - " + name);
+}
+```
+
+### Выполнение запросов на изменение 
+
+Для изменения данных используется метод `execute()`, принимающий обычный `Query`:
+
+```java
+Query insert = new InsertQuery(
+    users,
+    List.of(users.username().unbound()),
+    List.of(new InsertRow(new Parameter<>("alice")))
+);
+database.execute(insert);
+
+Query update = new UpdateQuery(
+    users,
+    List.of(new ColumnAssignment(users.status(), new Parameter<>("active"))),
+    new Equals(users.username(), new Parameter<>("alice"))
+);
+database.execute(update);
+
+Query delete = new DeleteQuery(
+    users,
+    new Equals(users.username(), new Parameter<>("alice"))
+);
+database.execute(delete);
+```
