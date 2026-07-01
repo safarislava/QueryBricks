@@ -11,4 +11,8 @@ public final class FakeColumns implements Columns {
     public String sql() {
         return this.columns;
     }
+
+    @Override
+    public void processAll(ColumnsProcessor consumer) {
+    }
 }

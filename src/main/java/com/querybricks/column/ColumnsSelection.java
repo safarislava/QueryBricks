@@ -14,4 +14,11 @@ public class ColumnsSelection implements Columns {
     public String sql() {
         return this.columns.stream().map(Column::sql).collect(Collectors.joining(", "));
     }
+
+    @Override
+    public void processAll(ColumnsProcessor processor) {
+        for (Column<?> column : this.columns) {
+            processor.process(column);
+        }
+    }
 }
