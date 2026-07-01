@@ -1,8 +1,9 @@
 package com.querybricks.query;
 
+import com.querybricks.column.Column;
 import com.querybricks.column.Columns;
-import com.querybricks.column.ColumnsProcessor;
 import com.querybricks.table.Table;
+import java.util.function.Consumer;
 
 public class SelectQuery implements ResultedQuery {
     private final Columns columns;
@@ -19,7 +20,7 @@ public class SelectQuery implements ResultedQuery {
     }
 
     @Override
-    public void processColumns(ColumnsProcessor consumer) {
+    public void processColumns(Consumer<Column<?>> consumer) {
         this.columns.processAll(consumer);
     }
 }

@@ -477,13 +477,13 @@ classDiagram
 
     class ResultedQuery {
         <<interface>>
-        + processColumns(ColumnsProcessor) void
+        + processColumns(Consumer~Column~) void
     }
     ResultedQuery ..|> Query
 
-    class ColumnsProcessor {
+    class Consumer {
         <<interface>>
-        + process(Column) void
+        + accept(Column) void
     }
 
     class DbPool {

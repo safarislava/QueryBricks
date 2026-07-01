@@ -1,6 +1,7 @@
 package com.querybricks.column;
 
 import com.querybricks.table.Table;
+import java.util.function.Consumer;
 
 public class AllColumns implements Columns {
     private final Table table;
@@ -15,9 +16,9 @@ public class AllColumns implements Columns {
     }
 
     @Override
-    public void processAll(ColumnsProcessor consumer) {
+    public void processAll(Consumer<Column<?>> consumer) {
         for (Column<?> column : this.table.columns()) {
-            consumer.process(column);
+            consumer.accept(column);
         }
     }
 }

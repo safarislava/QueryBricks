@@ -22,9 +22,8 @@ public class DataSourcePool implements DbPool {
     @SuppressWarnings("SqlSourceToSinkFlow")
     public void execute(Query query) {
         String sql = query.sql();
-        try {
-            Connection connection = this.source.getConnection();
-            Statement statement = connection.createStatement();
+        try (Connection connection = this.source.getConnection();
+             Statement statement = connection.createStatement()) {
             statement.execute(sql);
         } catch (SQLException e) {
             throw new IllegalStateException("Execution failed: " + sql, e);
@@ -38,10 +37,9 @@ public class DataSourcePool implements DbPool {
         query.processColumns(columns::add);
 
         String sql = query.sql();
-        try {
-            Connection connection = this.source.getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
+        try (Connection connection = this.source.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
             List<Row> rows = new ArrayList<>();
             while (resultSet.next()) {
                 rows.add(new InMemoryRow(columns, resultSet));

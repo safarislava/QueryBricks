@@ -1,6 +1,7 @@
 package com.querybricks.column;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ColumnsSelection implements Columns {
@@ -16,9 +17,9 @@ public class ColumnsSelection implements Columns {
     }
 
     @Override
-    public void processAll(ColumnsProcessor processor) {
+    public void processAll(Consumer<Column<?>> processor) {
         for (Column<?> column : this.columns) {
-            processor.process(column);
+            processor.accept(column);
         }
     }
 }
