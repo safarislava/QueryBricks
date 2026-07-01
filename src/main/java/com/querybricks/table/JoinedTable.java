@@ -1,5 +1,10 @@
 package com.querybricks.table;
 
+import com.querybricks.column.Column;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public final class JoinedTable<L extends Table, R extends Table> implements BinaryTable<L, R>, FilterableTable {
     private final L left;
     private final R right;
@@ -24,5 +29,13 @@ public final class JoinedTable<L extends Table, R extends Table> implements Bina
     @Override
     public String sql() {
         return String.format("%s %s", left.sql(), joinRule.sql(right));
+    }
+
+    @Override
+    public List<Column<?>> columns() {
+        List<Column<?>> columns = new ArrayList<>();
+        columns.addAll(left.columns());
+        columns.addAll(right.columns());
+        return columns;
     }
 }
