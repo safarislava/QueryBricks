@@ -2,6 +2,7 @@ plugins {
     java
     jacoco
     checkstyle
+    `maven-publish`
 }
 
 checkstyle {
@@ -14,6 +15,16 @@ version = "0.1.0"
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+        }
     }
 }
 
