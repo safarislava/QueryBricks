@@ -2,10 +2,19 @@ package com.querybricks.expression;
 
 import com.querybricks.Bindings;
 
+/**
+ * An expression representing the addition of two sub-expressions.
+ */
 public class Addition implements BinaryOperator {
     private final Expression left;
     private final Expression right;
 
+    /**
+     * Constructs an addition expression with two operands.
+     *
+     * @param left The left operand
+     * @param right The right operand
+     */
     public Addition(Expression left, Expression right) {
         this.left = left;
         this.right = right;
