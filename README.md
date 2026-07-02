@@ -38,7 +38,7 @@ repositories {
 
 ```
 dependencies {
-    implementation("com.github.safarislava:QueryBricks:0.1.0")
+    implementation("com.github.safarislava:querybricks:0.1.0")
 }
 ```
 
@@ -56,7 +56,7 @@ dependencies {
 ```xml
 <dependency>
     <groupId>com.github.safarislava</groupId>
-    <artifactId>QueryBricks</artifactId>
+    <artifactId>querybricks</artifactId>
     <version>0.1.0</version>
 </dependency>
 ```
