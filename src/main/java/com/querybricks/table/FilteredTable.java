@@ -3,10 +3,21 @@ package com.querybricks.table;
 import com.querybricks.Bindings;
 import com.querybricks.condition.Condition;
 
+/**
+ * A table wrapper that applies a filter (WHERE clause) to the underlying table.
+ *
+ * @param <T> the type of the filterable table
+ */
 public class FilteredTable<T extends FilterableTable> implements WrappedTable<T> {
     private final T table;
     private final Condition condition;
 
+    /**
+     * Constructs a new {@code FilteredTable} with the given table and filter condition.
+     *
+     * @param table the table to wrap and filter
+     * @param condition the filter condition to apply
+     */
     public FilteredTable(T table, Condition condition) {
         this.table = table;
         this.condition = condition;
