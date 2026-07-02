@@ -2,10 +2,21 @@ package com.querybricks.condition;
 
 import com.querybricks.Bindings;
 
+/**
+ * A condition representing the logical conjunction (AND) of two other conditions.
+ *
+ * @since 1.0.0
+ */
 public class And implements Condition {
     private final Condition left;
     private final Condition right;
 
+    /**
+     * Constructs an AND condition combining two other conditions.
+     *
+     * @param left the left-hand side condition
+     * @param right the right-hand side condition
+     */
     public And(Condition left, Condition right) {
         this.left = left;
         this.right = right;
