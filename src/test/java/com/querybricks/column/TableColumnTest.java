@@ -5,7 +5,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-class TableColumnTest {
+final class TableColumnTest {
     private final BoundColumn<Long> column = new TableColumn<>(
         new FakeFilterableTable("users"),
         new RawColumn<>("id")

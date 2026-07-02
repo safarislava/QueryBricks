@@ -4,7 +4,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-class RawColumnTest {
+final class RawColumnTest {
     private final Column<String> column = new RawColumn<>("username");
 
     @Test

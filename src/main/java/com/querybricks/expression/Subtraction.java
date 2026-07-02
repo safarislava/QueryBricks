@@ -5,7 +5,7 @@ import com.querybricks.Bindings;
 /**
  * An expression representing the subtraction of two sub-expressions.
  */
-public class Subtraction implements BinaryOperator {
+public final class Subtraction implements BinaryOperator {
     private final Expression left;
     private final Expression right;
 

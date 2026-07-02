@@ -5,7 +5,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-public class FilteredTableTest {
+final class FilteredTableTest {
     private final FilteredTable<FakeFilterableTable> table = new FilteredTable<>(
         new FakeFilterableTable("users"),
         new FakeCondition("users.id = 1")

@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * Represents a single row of values to be inserted into a table.
  */
-public class InsertRow implements QueryPart {
+public final class InsertRow implements QueryPart {
     private final List<Expression> values;
 
     /**

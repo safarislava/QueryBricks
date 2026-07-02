@@ -8,7 +8,7 @@ import com.querybricks.QueryPart;
  *
  * @since 1.0.0
  */
-public class GreaterThan implements Condition {
+public final class GreaterThan implements Condition {
     private final QueryPart left;
     private final QueryPart right;
 

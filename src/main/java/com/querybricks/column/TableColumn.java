@@ -8,7 +8,7 @@ import com.querybricks.table.Table;
  *
  * @param <T> the Java type representing the value type of the column
  */
-public class TableColumn<T> implements BoundColumn<T> {
+public final class TableColumn<T> implements BoundColumn<T> {
     private final Table table;
     private final UnboundColumn<T> column;
 

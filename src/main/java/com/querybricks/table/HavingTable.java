@@ -8,7 +8,7 @@ import com.querybricks.condition.Condition;
  *
  * @param <T> the type of the havable table
  */
-public class HavingTable<T extends HavableTable> implements WrappedTable<T> {
+public final class HavingTable<T extends HavableTable> implements WrappedTable<T> {
     private final T table;
     private final Condition condition;
 

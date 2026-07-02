@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 /**
  * Represents the wildcard selection of all columns (e.g., "*") from a table.
  */
-public class AllColumns implements Columns {
+public final class AllColumns implements Columns {
     private final Table table;
 
     /**

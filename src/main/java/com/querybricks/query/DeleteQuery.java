@@ -7,7 +7,7 @@ import com.querybricks.table.Table;
 /**
  * Represents a DELETE SQL query that removes rows from a table matching a specific condition.
  */
-public class DeleteQuery implements Query {
+public final class DeleteQuery implements Query {
     private final Table table;
     private final Condition condition;
 

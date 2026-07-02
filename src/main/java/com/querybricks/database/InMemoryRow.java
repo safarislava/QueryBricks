@@ -12,7 +12,7 @@ import java.util.Map;
  * An in-memory implementation of the {@link Row} interface,
  * backing the column values with a map.
  */
-public class InMemoryRow implements Row {
+public final class InMemoryRow implements Row {
     private final Map<String, Object> data;
 
     /**

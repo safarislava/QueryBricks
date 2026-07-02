@@ -4,7 +4,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-class SumTest {
+final class SumTest {
     private final Column<Integer> column = new Sum<>(
         new RawColumn<>("amount")
     );

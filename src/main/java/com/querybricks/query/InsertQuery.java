@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Represents an INSERT SQL query that inserts one or more rows into a table.
  */
-public class InsertQuery implements Query {
+public final class InsertQuery implements Query {
     private final Table table;
     private final List<UnboundColumn<?>> columns;
     private final List<InsertRow> rows;

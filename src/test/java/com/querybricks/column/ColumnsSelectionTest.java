@@ -4,7 +4,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-class ColumnsSelectionTest {
+final class ColumnsSelectionTest {
     private final Columns columns = new ColumnsSelection(
         new RawColumn<>("id"),
         new RawColumn<>("username"),

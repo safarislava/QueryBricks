@@ -7,7 +7,7 @@ import com.querybricks.Bindings;
  *
  * @since 1.0.0
  */
-public class And implements Condition {
+public final class And implements Condition {
     private final Condition left;
     private final Condition right;
 

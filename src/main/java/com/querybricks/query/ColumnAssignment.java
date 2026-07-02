@@ -9,7 +9,7 @@ import com.querybricks.expression.Expression;
  * Represents the assignment of an expression value to a database column.
  * Typically used in the SET clause of an UPDATE statement.
  */
-public class ColumnAssignment implements QueryPart {
+public final class ColumnAssignment implements QueryPart {
     private final Column<?> column;
     private final Expression value;
 

@@ -15,7 +15,7 @@ import java.util.List;
  * A connection pool implementation that wraps a JDBC {@link DataSource}
  * to execute queries and retrieve rows.
  */
-public class DataSourcePool implements DbPool {
+public final class DataSourcePool implements DbPool {
     private final DataSource source;
 
     /**

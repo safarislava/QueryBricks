@@ -4,7 +4,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-class CountTest {
+final class CountTest {
     private final Column<Long> column = new Count<>(
         new RawColumn<>("id")
     );
