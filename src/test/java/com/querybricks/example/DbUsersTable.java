@@ -5,7 +5,7 @@ import com.querybricks.column.RawColumn;
 import com.querybricks.column.TableColumn;
 import java.util.List;
 
-public class DbUsersTable implements UsersTable {
+public final class DbUsersTable implements UsersTable {
     private final String name;
 
     public DbUsersTable(String name) {

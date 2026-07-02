@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Represents an UPDATE SQL query that modifies existing rows in a database table.
  */
-public class UpdateQuery implements Query {
+public final class UpdateQuery implements Query {
     private final Table table;
     private final List<ColumnAssignment> assignments;
     private final Condition condition;

@@ -6,7 +6,7 @@ import com.querybricks.column.TableColumn;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class DbOrdersTable implements OrdersTable {
+public final class DbOrdersTable implements OrdersTable {
     private final String name;
 
     public DbOrdersTable(String name) {

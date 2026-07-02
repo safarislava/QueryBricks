@@ -7,7 +7,7 @@ import com.querybricks.Bindings;
  *
  * @param <T> the Java type representing the value type of the column
  */
-public class Avg<T> implements AggregatedColumn<T> {
+public final class Avg<T> implements AggregatedColumn<T> {
     private final Column<T> column;
 
     /**

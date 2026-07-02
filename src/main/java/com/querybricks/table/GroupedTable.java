@@ -8,7 +8,7 @@ import com.querybricks.column.Columns;
  *
  * @param <T> the type of the underlying table
  */
-public class GroupedTable<T extends Table> implements HavableTable, WrappedTable<T> {
+public final class GroupedTable<T extends Table> implements HavableTable, WrappedTable<T> {
     private final T table;
     private final Columns columns;
 

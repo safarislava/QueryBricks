@@ -4,7 +4,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-class AvgTest {
+final class AvgTest {
     private final Column<Double> column = new Avg<>(
         new RawColumn<>("rating")
     );

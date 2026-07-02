@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 /**
  * A selection of specific columns to be queried.
  */
-public class ColumnsSelection implements Columns {
+public final class ColumnsSelection implements Columns {
     private final List<Column<?>> columns;
 
     /**

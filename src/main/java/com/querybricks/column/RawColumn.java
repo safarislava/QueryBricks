@@ -7,7 +7,7 @@ import com.querybricks.Bindings;
  *
  * @param <T> the Java type representing the value type of the column
  */
-public class RawColumn<T> implements UnboundColumn<T> {
+public final class RawColumn<T> implements UnboundColumn<T> {
     private final String name;
 
     /**

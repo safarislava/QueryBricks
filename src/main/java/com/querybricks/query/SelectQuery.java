@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 /**
  * Represents a SELECT SQL query that retrieves data from a database table.
  */
-public class SelectQuery implements ResultedQuery {
+public final class SelectQuery implements ResultedQuery {
     private final Columns columns;
     private final Table table;
 

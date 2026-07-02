@@ -1,1 +1,1 @@
-rootProject.name = "QueryBricks"
+rootProject.name = "querybricks"

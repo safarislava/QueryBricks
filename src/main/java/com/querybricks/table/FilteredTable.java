@@ -8,7 +8,7 @@ import com.querybricks.condition.Condition;
  *
  * @param <T> the type of the filterable table
  */
-public class FilteredTable<T extends FilterableTable> implements WrappedTable<T> {
+public final class FilteredTable<T extends FilterableTable> implements WrappedTable<T> {
     private final T table;
     private final Condition condition;
 

@@ -5,7 +5,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-class AllColumnsTest {
+final class AllColumnsTest {
     private final AllColumns allColumns = new AllColumns(
         new FakeFilterableTable("users")
     );

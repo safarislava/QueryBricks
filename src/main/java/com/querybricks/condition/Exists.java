@@ -8,7 +8,7 @@ import com.querybricks.query.Query;
  *
  * @since 1.0.0
  */
-public class Exists implements Condition {
+public final class Exists implements Condition {
     private final Query query;
 
     /**
